@@ -128,10 +128,32 @@ pulsarTest3 %>% ggplot(aes(x = integ_mean, y = DMSNR_mean,
 
 knitr::kable(table(rf_pred, pulsarTest$Class))
 
-###################################################################################
-
+##########################################################################################
 ggplot(df_pulsar2) + geom_density(aes(x = integ_mean, fill = dense_colors[1]), alpha = .2)
 ggplot(df_pulsar2) + geom_density(aes(x = integ_sd, fill = dense_colors[2]), alpha = .2)
 ggplot(df_pulsar2) + geom_density(aes(x = integ_exkur, fill = dense_colors[3]), alpha = .2)
 ggplot(df_pulsar2) + geom_density(aes(x = integ_skew, fill = dense_colors[4]), alpha = .2)
- 
+##########################################################################################
+
+df_pulsar3 <- df_pulsar %>% gather(key = measure, 
+                                   value = value, integ_mean:DMSNR_skew)
+##########################################################################################
+var <- names(df_pulsar)
+
+proper_names <- c("Integrated Mean", "Integrated Standard Deviation", 
+                  "Integrated Kurtosis", "Intergrated Skew",
+                  "DMSNR Mean", "DMSNR Standard Deviation", "DMSNR Kurtosis",
+                  "DMSNR Skew")
+##########################################################################################
+selection <- c(5,1)
+
+df_pulsar %>% rename(x = var[selection[1]], y = var[selection[2]]) %>%
+  ggplot() + geom_point(aes(x = x, y = y, col = Class)) + 
+  labs(x = proper_names[selection[1]], 
+       y = proper_names[selection[2]],
+       title = paste(proper_names[selection[2]],
+                     "vs" ,
+                     proper_names[selection[1]]))
+
+df_pulsar %>% print()
+#########################################################################################
