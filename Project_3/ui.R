@@ -63,7 +63,8 @@ shinyUI(fluidPage(
                                                                                  "DMSNR Standard Deviation" = "d_sd", 
                                                                                  "DMSNR Kurtosis" = "d_kurt", 
                                                                                  "DMSNR Skew" = "d_skew"), 
-                                     selected = "DMSNR Mean")
+                                     selected = "DMSNR Mean"),
+                         actionButton("create", "Create Plot")
                      ),
                      
                      mainPanel(
