@@ -70,6 +70,8 @@ shinyUI(fluidPage(
                      
                      mainPanel(
                          plotOutput("edaPlot"),
+                         plotOutput("denPlot1"),
+                         plotOutput("denPlot2"),
                          dataTableOutput("small_tab")
                      )
                  )
