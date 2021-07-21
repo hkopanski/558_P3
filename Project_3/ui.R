@@ -24,6 +24,7 @@ df_pulsar <- df_pulsar %>%
     mutate(Class = ifelse(Class == 1, "Pulsar", "Non Pulsar"))
 
 df_pulsar$Class <- as.factor(df_pulsar$Class)
+df_pulsar2 <- df_pulsar %>% mutate_at(names(df_pulsar)[1:8], ~(scale(.) %>% as.vector))
 
 var <- names(df_pulsar)
 
