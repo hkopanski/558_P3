@@ -52,8 +52,10 @@ df_pulsar %>% rename(x = var[var1], y = var[var2]) %>%
        y = proper_names2[var2 - 4],
        title = paste(proper_names1[var1],
                      "vs" ,
-                     proper_names2[var2 - 4]))
-
+                     proper_names2[var2 - 4])) +
+  theme(legend.position = c(0.9, 0.8)) +
+  scale_color_manual(values = c("Non Pulsar" = dense_colors[1],
+                                "Pulsar" = dense_colors[7]))
 
 ##################Colors for charts###################################
 dense_colors <- c("#003f5c", "#2f4b7c", "#665191", "#a05195", 

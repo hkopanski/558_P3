@@ -54,7 +54,10 @@ shinyServer(function(input, output, session) {
                   y = proper_names2[var2 - 4],
                   title = paste(proper_names2[var2 - 4],
                                 "vs" ,
-                                proper_names1[var1]))
+                                proper_names1[var1])) +
+             theme(legend.position = c(0.9, 0.9)) +
+             scale_color_manual(values = c("Pulsar" = dense_colors[1],
+                                        "Non Pulsar" = dense_colors[7]))
        
     })
   
