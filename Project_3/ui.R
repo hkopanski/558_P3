@@ -38,7 +38,7 @@ shinyUI(fluidPage(
     titlePanel("Pulsar Classification"),
     
     tabsetPanel(
-        tabPanel("Exporatory Data Analysis", fluid = TRUE,
+        tabPanel("Exporatory Data Analysis",
                  sidebarLayout(
                      sidebarPanel(
         
@@ -64,7 +64,6 @@ shinyUI(fluidPage(
                                                                                  "DMSNR Kurtosis" = "d_kurt", 
                                                                                  "DMSNR Skew" = "d_skew"), 
                                      selected = "DMSNR Mean"),
-                         actionButton("create", "Create Plot")
                      ),
                      
                      mainPanel(
@@ -75,16 +74,20 @@ shinyUI(fluidPage(
                      )
                  )
         ),
-        tabPanel("Deep Dive", fluid = TRUE,
+        tabPanel("Deep Dive",
                  sidebarLayout(
-                     sidebarPanel(sliderInput("year", "Year:", min = 1968, max = 2009, value = 2009, sep='')),
+                     sidebarPanel(radioButtons("dd_type",
+                                               "Select Unsupervised Learning Type",
+                                               c("K Means" = "A",
+                                                 "PCA" = "B")),
+                                  br(),),
                      mainPanel(fluidRow(
                          htmlOutput("Attacks")
                      )
                      )
                  )
         ),
-        tabPanel("Modeling the Data", fluid = TRUE,
+        tabPanel("Modeling the Data",
                  sidebarLayout(
                      sidebarPanel(sliderInput("year", "Year:", min = 1968, max = 2009, value = 2009, sep='')),
                      mainPanel(fluidRow(

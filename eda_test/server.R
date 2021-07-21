@@ -28,8 +28,8 @@ shinyServer(function(input, output, session) {
     
     output$edaPlot <- renderPlot({ 
         
-        var1 <- switch(input$var_sel1, i_mean = "integ_mean", i_sd = "integ_sd")
-        var2 <- switch(input$var_sel2, d_mean = "DMSNR_mean", d_sd = "DMSNR_sd")
+        var1 <- switch(input$var_sel1, i_mean = "integ_mean", i_sd = "integ_sd", i_kurt = "integ_exkur", i_skew = "integ_skew")
+        var2 <- switch(input$var_sel2, d_mean = "DMSNR_mean", d_sd = "DMSNR_sd", d_kurt = "DMSNR_exkur", d_skew = "DMSNR_skew")
  
         df_pulsar %>% rename(x = var1, y = var2) %>%
             ggplot() + geom_point(aes(x = x, y = y, col = Class))

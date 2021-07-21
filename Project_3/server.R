@@ -35,29 +35,27 @@ proper_names <- c("Integrated Mean", "Integrated Standard Deviation",
 
 shinyServer(function(input, output, session) {
     
-    output$edaPlot <- eventReactive(input$create, { renderPlot({
+    output$edaPlot <- renderPlot({
         
-        var1 <- switch(input$var_sel1,
-                       i_mean = var[1],
-                       i_sd   = var[2],
-                       i_kurt = var[3],
-                       i_skew = var[4])
+      var1 <- switch(input$var_sel1, 
+                     i_mean = "integ_mean", 
+                     i_sd = "integ_sd", 
+                     i_kurt = "integ_exkur", 
+                     i_skew = "integ_skew")
+      var2 <- switch(input$var_sel2, 
+                     d_mean = "DMSNR_mean", 
+                     d_sd = "DMSNR_sd", 
+                     d_kurt = "DMSNR_exkur", 
+                     d_skew = "DMSNR_skew")
       
-        var2 <- switch(input$var_sel2,
-                       d_mean = var[5],
-                       d_sd   = var[6],
-                       d_kurt = var[7],
-                       d_skew = var[8])
       
-        p1 <- df_pulsar %>% rename(x = var1, y = var2) %>%
+        df_pulsar %>% rename(x = var1, y = var2) %>%
              ggplot() + geom_point(aes(x = x, y = y, col = Class)) #+ 
             #labs(x = proper_names[selection[1]], 
                  #y = proper_names[selection[2]],
                  #title = paste(proper_names[selection[2]],
                                #"vs" ,
                                #proper_names[selection[1]]))
-      
-       print(p1) })
        
     })
     
