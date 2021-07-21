@@ -18,26 +18,17 @@ df_pulsar$Class <- as.factor(df_pulsar$Class)
 
 var <- names(df_pulsar)
 
-proper_names <- c("Integrated Mean", "Integrated Standard Deviation", 
-                  "Integrated Kurtosis", "Intergrated Skew",
-                  "DMSNR Mean", "DMSNR Standard Deviation", "DMSNR Kurtosis",
-                  "DMSNR Skew")
+proper_names1 <- c("Integrated Mean", "Integrated Standard Deviation", 
+                   "Integrated Kurtosis", "Intergrated Skew")
+proper_names2 <- c("DMSNR Mean", "DMSNR Standard Deviation", "DMSNR Kurtosis",
+                   "DMSNR Skew")
 
-var_sel1 <- "i_skew"
-var_sel2 <- "d_skew"
+var_sel1 <- "integ_skew"
+var_sel2 <- "DMSNR_skew"
 
 
-var1 <- switch(var_sel1,
-               i_mean = "integ_mean", 
-               i_sd = "integ_sd", 
-               i_kurt = "integ_exkur", 
-               i_skew = "integ_skew")
-
-var2 <- switch(var_sel2,
-               d_mean = "DMSNR_mean", 
-               d_sd = "DMSNR_sd", 
-               d_kurt = "DMSNR_exkur", 
-               d_skew = "DMSNR_skew")
+var1 <- which(var == var_sel1)
+var2 <- which(var == var_sel2)
 
 p1 <- df_pulsar %>% rename(x = var1, y = var2) %>%
   ggplot() + geom_point(aes(x = x, y = y, col = Class))
@@ -48,3 +39,15 @@ df_pulsar %>% head()
 
 df_pulsar %>% rename(x = var1, y = var2) %>%
   ggplot() + geom_point(aes(x = x, y = y, col = Class), size = 0.25) 
+
+
+which(var == var_sel1)
+
+
+df_pulsar %>% rename(x = var[var1], y = var[var2]) %>%
+  ggplot() + geom_point(aes(x = x, y = y, col = Class), size = 0.25) + 
+  labs(x = proper_names1[var1], 
+       y = proper_names2[var2 - 4],
+       title = paste(proper_names1[var1],
+                     "vs" ,
+                     proper_names2[var2 - 4]))

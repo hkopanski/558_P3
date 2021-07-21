@@ -24,6 +24,7 @@ df_pulsar <- df_pulsar %>%
     mutate(Class = ifelse(Class == 1, "Pulsar", "Non Pulsar"))
 
 df_pulsar$Class <- as.factor(df_pulsar$Class)
+
 df_pulsar2 <- df_pulsar %>% mutate_at(names(df_pulsar)[1:8], ~(scale(.) %>% as.vector))
 
 var <- names(df_pulsar)
@@ -51,27 +52,25 @@ shinyUI(fluidPage(
                          
                          radioButtons("df_type",
                                       "Select Data Type",
-                                      c("Raw" = "A",
-                                        "Standardized" = "B")),
+                                      list("Raw" = "A",
+                                           "Standardized" = "B")),
                          br(),
-                         selectInput("var_sel1", "First Variable to Plot", list("Integrated Mean" = "i_mean", 
-                                                                                "Integrated Standard Deviation" = "i_sd", 
-                                                                                "Integrated Kurtosis" = "i_kurt", 
-                                                                                "Intergrated Skew" = "i_skew"), 
+                         selectInput("var_sel1", "First Variable to Plot", list("Integrated Mean" = "integ_mean", 
+                                                                                "Integrated Standard Deviation" = "integ_sd", 
+                                                                                "Integrated Kurtosis" = "integ_exkur", 
+                                                                                "Intergrated Skew" = "integ_skew"), 
                                      selected = "Integrated Mean"),
                          
-                         selectInput("var_sel2", "Second Variable to Plot", list("DMSNR Mean" = "d_mean", 
-                                                                                 "DMSNR Standard Deviation" = "d_sd", 
-                                                                                 "DMSNR Kurtosis" = "d_kurt", 
-                                                                                 "DMSNR Skew" = "d_skew"), 
+                         selectInput("var_sel2", "Second Variable to Plot", list("DMSNR Mean" = "DMSNR_mean", 
+                                                                                 "DMSNR Standard Deviation" = "DMSNR_sd", 
+                                                                                 "DMSNR Kurtosis" = "DMSNR_exkur", 
+                                                                                 "DMSNR Skew" = "DMSNR_skew"), 
                                      selected = "DMSNR Mean"),
                      ),
                      
                      mainPanel(
-                         textOutput("edaText"),
-                         h4("There should be a plot here"),
-                         br(),
                          plotOutput("edaPlot"),
+                         dataTableOutput("small_tab")
                      )
                  )
         ),
@@ -82,18 +81,14 @@ shinyUI(fluidPage(
                                                c("K Means" = "A",
                                                  "PCA" = "B")),
                                   br(),),
-                     mainPanel(fluidRow(
-                         htmlOutput("Attacks")
-                     )
+                     mainPanel(
                      )
                  )
         ),
         tabPanel("Modeling the Data",
                  sidebarLayout(
                      sidebarPanel(sliderInput("year", "Year:", min = 1968, max = 2009, value = 2009, sep='')),
-                     mainPanel(fluidRow(
-                         htmlOutput("Attacks")
-                 )
+                     mainPanel(
                  )
              )
         )

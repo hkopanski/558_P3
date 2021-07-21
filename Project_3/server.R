@@ -17,49 +17,51 @@ library(DT)
 
 
 df_pulsar <- read_csv("./Data/HTRU_2.csv", col_names = FALSE)
+    
 names(df_pulsar) <- c("integ_mean","integ_sd","integ_exkur","integ_skew",
-                      "DMSNR_mean","DMSNR_sd","DMSNR_exkur","DMSNR_skew","Class")
+                          "DMSNR_mean","DMSNR_sd","DMSNR_exkur","DMSNR_skew","Class")
     
 df_pulsar <- df_pulsar %>% mutate(Class = ifelse(Class == 1, "Pulsar", "Non Pulsar"))
+    
 df_pulsar$Class <- as.factor(df_pulsar$Class)
 
 df_pulsar2 <- df_pulsar %>% mutate_at(names(df_pulsar)[1:8], ~(scale(.) %>% as.vector))
 
 var <- names(df_pulsar)
 
-proper_names <- c("Integrated Mean", "Integrated Standard Deviation", 
-                  "Integrated Kurtosis", "Intergrated Skew",
-                  "DMSNR Mean", "DMSNR Standard Deviation", "DMSNR Kurtosis",
-                  "DMSNR Skew")
+proper_names1 <- c("Integrated Mean", "Integrated Standard Deviation", 
+                  "Integrated Kurtosis", "Intergrated Skew")
+proper_names2 <- c("DMSNR Mean", "DMSNR Standard Deviation", "DMSNR Kurtosis",
+                   "DMSNR Skew")
+
 
 shinyServer(function(input, output, session) {
     
-    output$edaPlot <- renderPlot({
+  
+  
+  
+  output$edaPlot <- renderPlot({
         
-      var1 <- switch(input$var_sel1, 
-                     i_mean = "integ_mean", 
-                     i_sd = "integ_sd", 
-                     i_kurt = "integ_exkur", 
-                     i_skew = "integ_skew")
-      var2 <- switch(input$var_sel2, 
-                     d_mean = "DMSNR_mean", 
-                     d_sd = "DMSNR_sd", 
-                     d_kurt = "DMSNR_exkur", 
-                     d_skew = "DMSNR_skew")
+        if(input$df_type == "A") {df_data = df_pulsar} else {df_data = df_pulsar2 }  
+    
+        var1 <- which(var == input$var_sel1)
+        var2 <- which(var == input$var_sel2)
       
-      
-        df_pulsar %>% rename(x = var1, y = var2) %>%
-             ggplot() + geom_point(aes(x = x, y = y, col = Class)) #+ 
-            #labs(x = proper_names[selection[1]], 
-                 #y = proper_names[selection[2]],
-                 #title = paste(proper_names[selection[2]],
-                               #"vs" ,
-                               #proper_names[selection[1]]))
+        df_data %>% rename(x = var[var1], y = var[var2]) %>%
+             ggplot() + geom_point(aes(x = x, y = y, col = Class), size = 0.25) + 
+             labs(x = proper_names1[var1], 
+                  y = proper_names2[var2 - 4],
+                  title = paste(proper_names2[var2 - 4],
+                                "vs" ,
+                                proper_names1[var1]))
        
     })
     
     output$small_tab <- renderDataTable({
-            df_pulsar %>%
+      
+            if(input$df_type == "A"){df_data = df_pulsar} else {df_data = df_pulsar2 }
+      
+            df_data %>%
             head() %>%
             datatable()
     })
