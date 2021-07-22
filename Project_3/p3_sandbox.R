@@ -55,7 +55,8 @@ df_pulsar %>% rename(x = var[var1], y = var[var2]) %>%
                      proper_names2[var2 - 4])) +
   theme(legend.position = c(0.9, 0.8)) +
   scale_color_manual(values = c("Non Pulsar" = dense_colors[1],
-                                "Pulsar" = dense_colors[7]))
+                                "Pulsar" = dense_colors[7])) +
+  stat_ellipse(aes(x = x, y = y, col = Class))
 
 ##################Colors for charts###################################
 dense_colors <- c("#003f5c", "#2f4b7c", "#665191", "#a05195", 
@@ -87,4 +88,16 @@ ggplot(df_pulsar2) +
   scale_fill_manual(guide = guide_legend(), name =  "DM-SNR \nReadings",  
                     labels = c("Mean", "Standard Deviation","Kurtosis", "Skew"), 
                     values = dense_colors[5:8])
+################################################################################
+library(matrixStats)
+d <- colMeans(df_pulsar[,1:8])
+a <- t(colQuantiles(as.matrix(df_pulsar[, 1:8])))
+b <- t(colRanges(as.matrix(df_pulsar[, 1:8])))
+c <- t(colIQRs(as.matrix(df_pulsar[, 1:8])))
 
+rbind(d,b,c,a)
+
+knitr::kable(summary(df_pulsar))
+################################################################################
+
+df_pulsar %>% ggplot() + geom_boxplot(aes(x = Class, y = integ_mean))

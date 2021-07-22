@@ -14,6 +14,9 @@ library(forcats)
 library(MASS)
 library(caret)
 library(DT)
+library(matrixStats)
+library(GGally)
+library(shinycssloaders)
 
 df_pulsar <- read_csv("./Data/HTRU_2.csv", col_names = FALSE)
 
@@ -34,7 +37,8 @@ proper_names <- c("Integrated Mean", "Integrated Standard Deviation",
                   "DMSNR Mean", "DMSNR Standard Deviation", "DMSNR Kurtosis",
                   "DMSNR Skew")
 
-# Define UI for application that draws a histogram
+options(spinner.color="#003f5c", spinner.color.background="#ffffff", spinner.size=2)
+
 shinyUI(fluidPage(
     
     titlePanel("Pulsar Classification"),
@@ -44,35 +48,54 @@ shinyUI(fluidPage(
                  sidebarLayout(
                      sidebarPanel(
         
+                         h4("Select options below for exploratory analysis of pulsar data"),
+                         br(),
                          radioButtons("plot_type",
                                       "Select the Plot Type",
-                                      c("Scatter" = "A",
-                                        "Density" = "B")),
+                                      list("Scatter" = "A",
+                                           "Density" = "B",
+                                           "Pairs" = "C")),
                          br(),
-                         
+                         h4("Select below to use standardized data"),
+                         br(),
                          radioButtons("df_type",
                                       "Select Data Type",
                                       list("Raw" = "A",
                                            "Standardized" = "B")),
                          br(),
-                         selectInput("var_sel1", "First Variable to Plot", list("Integrated Mean" = "integ_mean", 
+                         conditionalPanel(condition = "input.plot_type == 'A'",
+                         br(),                  
+                         h4("Choose Variables Below for Scatterplot"),
+                         br(),
+                         selectInput("var_sel1", "First Variable to Plot (X Axis)", 
+                                                                                list("Integrated Mean" = "integ_mean", 
                                                                                 "Integrated Standard Deviation" = "integ_sd", 
                                                                                 "Integrated Kurtosis" = "integ_exkur", 
                                                                                 "Intergrated Skew" = "integ_skew"), 
                                      selected = "Integrated Mean"),
                          
-                         selectInput("var_sel2", "Second Variable to Plot", list("DMSNR Mean" = "DMSNR_mean", 
+                         selectInput("var_sel2", "Second Variable to Plot (Y Axis)", 
+                                                                                 list("DMSNR Mean" = "DMSNR_mean", 
                                                                                  "DMSNR Standard Deviation" = "DMSNR_sd", 
                                                                                  "DMSNR Kurtosis" = "DMSNR_exkur", 
                                                                                  "DMSNR Skew" = "DMSNR_skew"), 
                                      selected = "DMSNR Mean"),
+                     )
+                     
                      ),
                      
                      mainPanel(
-                         plotOutput("edaPlot"),
-                         plotOutput("denPlot1"),
-                         plotOutput("denPlot2"),
-                         dataTableOutput("small_tab")
+                         conditionalPanel(condition = "input.plot_type == 'A'",
+                            withSpinner(plotOutput("edaPlot"), type = 5)),
+                         conditionalPanel(condition = "input.plot_type == 'B'",
+                            h4("Density Plot for the 4 Integrated Measurements"),
+                            withSpinner(plotOutput("denPlot1"), type = 5),
+                            h4("Density Plot for the 4 DM-SNR Measurements"),
+                            withSpinner(plotOutput("denPlot2"), type = 5)),
+                         conditionalPanel(condition = "input.plot_type == 'C'",
+                            h4("Pairs Plot for Pulsar Data"),
+                            withSpinner(plotOutput("pairsPlot"),type = 5)),                  
+                         tableOutput("information")
                      )
                  )
         ),

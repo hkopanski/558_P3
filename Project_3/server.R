@@ -14,6 +14,9 @@ library(forcats)
 library(MASS)
 library(caret)
 library(DT)
+library(matrixStats)
+library(GGally)
+library(shinycssloaders)
 
 
 df_pulsar <- read_csv("./Data/HTRU_2.csv", col_names = FALSE)
@@ -40,15 +43,17 @@ dense_colors <- c("#003f5c", "#2f4b7c", "#665191", "#a05195",
 ##################################################################################
 
 shinyServer(function(input, output, session) {
- 
+  df_data <- reactive({
+                  switch(input$df_type,
+                         "A" = df_pulsar,
+                         "B" = df_pulsar2)
+  }) 
   output$edaPlot <- renderPlot({
         
-        if(input$df_type == "A") {df_data = df_pulsar} else {df_data = df_pulsar2 }  
-    
         var1 <- which(var == input$var_sel1)
         var2 <- which(var == input$var_sel2)
       
-        df_data %>% rename(x = var[var1], y = var[var2]) %>%
+        df_data() %>% rename(x = var[var1], y = var[var2]) %>%
              ggplot() + geom_point(aes(x = x, y = y, col = Class), size = 0.25) + 
              labs(x = proper_names1[var1], 
                   y = proper_names2[var2 - 4],
@@ -63,9 +68,7 @@ shinyServer(function(input, output, session) {
   
   output$denPlot1 <- renderPlot({
     
-    if(input$df_type == "A") {df_data = df_pulsar} else {df_data = df_pulsar2 }  
-    
-    ggplot(df_data) +
+    ggplot(df_data()) +
       geom_density(aes(x = integ_mean, fill = dense_colors[1]), alpha = .2) +
       geom_density(aes(x = integ_sd, fill = dense_colors[2]), alpha = .2) +
       geom_density(aes(x = integ_exkur, fill = dense_colors[3]), alpha = .2) +
@@ -81,9 +84,7 @@ shinyServer(function(input, output, session) {
   
   output$denPlot2 <- renderPlot({
     
-    if(input$df_type == "A") {df_data = df_pulsar} else {df_data = df_pulsar2 }  
-    
-    ggplot(df_data) +
+    ggplot(df_data()) +
       geom_density(aes(x = DMSNR_mean, fill = dense_colors[5]), alpha = .2) +
       geom_density(aes(x = DMSNR_sd, fill = dense_colors[6]), alpha = .2) +
       geom_density(aes(x = DMSNR_exkur, fill = dense_colors[7]), alpha = .2) +
@@ -96,8 +97,12 @@ shinyServer(function(input, output, session) {
                         values = dense_colors[5:8])
     
   })
+  
+  output$pairsPlot <- renderPlot({
+    ggpairs(df_data(), mapping = ggplot2::aes(color = Class))
+  })
     
-    output$small_tab <- renderDataTable({
+  output$small_tab <- renderDataTable({
       
             if(input$df_type == "A"){df_data = df_pulsar} else {df_data = df_pulsar2 }
       
@@ -107,7 +112,19 @@ shinyServer(function(input, output, session) {
     })
     
     output$information <- renderTable({
-            df_pulsar %>% head()
-    })
+      a <- colMeans(df_data()[,1:8])
+      b <- t(colQuantiles(as.matrix(df_data()[, 1:8])))
+      c <- t(colIQRs(as.matrix(df_data()[, 1:8])))
+      
+      r_names <- c("Means", "Min", "25%", "Median", "75%", "Max" ,"Min IQR", "Max IQR")
+      
+      summary_table <- matrix(rbind(a, b, c, d), nrow = 8)
+      colnames(summary_table) <- c("Integrated Mean", "Integrated Standard Deviation", "Integrated Kurtosis", 
+                                   "Intergrated Skew", "DMSNR Mean", "DMSNR Standard Deviation", "DMSNR Kurtosis", "DMSNR Skew")
+      
+      rownames(summary_table) <- r_names
+      
+      summary_table
+    }, rownames = TRUE)
 
 })
