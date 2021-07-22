@@ -133,6 +133,12 @@ shinyUI(fluidPage(
                                           withSpinner(plotOutput("kmeans_plot"), type = 5)),
                          conditionalPanel(condition = "input.dd_type == 'B' & input.pca_plot_type == 'A'",
                                           withSpinner(plotOutput("PCA_biplot"), type = 5)),
+                         conditionalPanel(condition = "input.dd_type == 'B' & input.pca_plot_type == 'B'",
+                                          withSpinner(plotOutput("PCA_scree"), type = 5)),
+                         conditionalPanel(condition = "input.dd_type == 'B' & input.pca_plot_type == 'C'",
+                                          withSpinner(plotOutput("PCA_scree_cum"), type = 5)),
+                         conditionalPanel(condition = "input.dd_type == 'B'",
+                                          withSpinner(tableOutput("PCA_tab"), type = 5)),
                      )
                  )
         ),

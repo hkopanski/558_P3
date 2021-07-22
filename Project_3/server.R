@@ -33,13 +33,28 @@ df_pulsar2 <- df_pulsar %>% mutate_at(names(df_pulsar)[1:8], ~(scale(.) %>% as.v
 
 var <- names(df_pulsar)
 
+proper_names <-  c("Integrated Mean", "Integrated Standard Deviation", 
+                   "Integrated Kurtosis", "Intergrated Skew", "DMSNR Mean", 
+                   "DMSNR Standard Deviation", "DMSNR Kurtosis", "DMSNR Skew")
+
 proper_names1 <- c("Integrated Mean", "Integrated Standard Deviation", 
                   "Integrated Kurtosis", "Intergrated Skew")
+
 proper_names2 <- c("DMSNR Mean", "DMSNR Standard Deviation", "DMSNR Kurtosis",
                    "DMSNR Skew")
 
 dense_colors <- c("#003f5c", "#2f4b7c", "#665191", "#a05195", 
                   "#d45087", "#f95d6a", "#ff7c43", "#ffa600")
+
+PCA_pulsar <- df_pulsar %>% dplyr::select("integ_mean":"DMSNR_skew") %>% 
+  prcomp(., scale = TRUE)
+
+df_pca_plot <- as_tibble(cbind(1:8, PCA_pulsar$sdev^2))
+
+PCA_tab <- data.frame(PCA_pulsar$rotation, 
+                      row.names = proper_names)
+
+colnames(df_pca_plot) <- c("PCA", "variance")
 
 ##################################################################################
 
@@ -169,9 +184,8 @@ shinyServer(function(input, output, session) {
                            input$k_clust, "Clusters"))
     })
     
+    
     output$PCA_biplot <- renderPlot({
-      PCA_pulsar <- df_pulsar %>% dplyr::select("integ_mean":"DMSNR_skew") %>% 
-                                  prcomp(., scale = TRUE)
       
       ggplot_pca(PCA_pulsar, 
                  choices = 1:2, 
@@ -185,5 +199,41 @@ shinyServer(function(input, output, session) {
                  arrows_alpha = 0.75,
                  base_textsize = 12)
     })
+    
+    output$PCA_scree <- renderPlot ({
+      
+      df_pca_plot %>% ggplot(aes(x = PCA, y = variance/sum(variance))) + 
+        geom_point(shape = 5, col = dense_colors[5]) + 
+        geom_line(col = dense_colors[5]) + labs(x = "Principal Component", 
+                                                y = "Proportion of Variance Explained",
+                                                title = "Proportion of Variance") +
+        geom_text(aes(x = PCA, 
+                      y = variance/sum(variance), 
+                      label = round(variance/sum(variance), 4),
+                      hjust = -0.25,
+                      vjust = -0.9)) + 
+        scale_x_continuous(breaks = seq(0, 8, 1))
+    
+    })
+    
+    output$PCA_scree_cum <- renderPlot ({  
+        
+      df_pca_plot %>% ggplot(aes(x = PCA, y = cumsum(variance/sum(variance)))) + 
+        geom_point(shape = 5, col = dense_colors[2]) + 
+        geom_line(col = dense_colors[2]) + labs(x = "Principal Component", 
+                                                y = "Cumulative Proportion of Variance Explained",
+                                                title = "Cumulative Proportion Variance") +
+        geom_text(aes(x = PCA, 
+                      y = cumsum(variance/sum(variance)), 
+                      label = round(cumsum(variance/sum(variance)), 4),
+                      hjust = 1,
+                      vjust = -2)) +
+        ylim(NA, 1.025) + 
+        scale_x_continuous(breaks = seq(0, 8, 1))
+    })
+    
+    output$PCA_tab <- renderTable({
+      PCA_tab
+    }, rownames = TRUE)
 
 })
