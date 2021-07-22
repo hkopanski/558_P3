@@ -17,6 +17,7 @@ library(DT)
 library(matrixStats)
 library(GGally)
 library(shinycssloaders)
+library(AMR)
 
 df_pulsar <- read_csv("./Data/HTRU_2.csv", col_names = FALSE)
 
@@ -103,10 +104,35 @@ shinyUI(fluidPage(
                  sidebarLayout(
                      sidebarPanel(radioButtons("dd_type",
                                                "Select Unsupervised Learning Type",
-                                               c("K Means" = "A",
-                                                 "PCA" = "B")),
-                                  br(),),
+                                               list("K Means" = "A",
+                                                    "PCA" = "B")),
+                                  conditionalPanel(condition = "input.dd_type == 'A'",
+                                                   sliderInput("k_clust", "Number of Clusters (K)", min = 2, max = 8, value = 3),
+                                                   selectInput("km_sel1", "First Variable to Plot (X Axis)", 
+                                                               list("Integrated Mean" = "integ_mean", 
+                                                                    "Integrated Standard Deviation" = "integ_sd", 
+                                                                    "Integrated Kurtosis" = "integ_exkur", 
+                                                                    "Intergrated Skew" = "integ_skew"), 
+                                                               selected = "Integrated Mean"),
+                                                   
+                                                   selectInput("km_sel2", "Second Variable to Plot (Y Axis)", 
+                                                               list("DMSNR Mean" = "DMSNR_mean", 
+                                                                    "DMSNR Standard Deviation" = "DMSNR_sd", 
+                                                                    "DMSNR Kurtosis" = "DMSNR_exkur", 
+                                                                    "DMSNR Skew" = "DMSNR_skew"), 
+                                                               selected = "DMSNR Mean")),
+                                  conditionalPanel(condition = "input.dd_type == 'B'",
+                                                   radioButtons("pca_plot_type", "Select a PCA Plot",
+                                                                list("Biplot" = "A",
+                                                                     "Screeplot" = "B",
+                                                                     "Screeplot (Cumulative)" = "C")),
+                                  )
+                                  ),
                      mainPanel(
+                         conditionalPanel(condition = "input.dd_type == 'A'",
+                                          withSpinner(plotOutput("kmeans_plot"), type = 5)),
+                         conditionalPanel(condition = "input.dd_type == 'B' & input.pca_plot_type == 'A'",
+                                          withSpinner(plotOutput("PCA_biplot"), type = 5)),
                      )
                  )
         ),

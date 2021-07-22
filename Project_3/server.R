@@ -17,6 +17,7 @@ library(DT)
 library(matrixStats)
 library(GGally)
 library(shinycssloaders)
+library(AMR)
 
 
 df_pulsar <- read_csv("./Data/HTRU_2.csv", col_names = FALSE)
@@ -116,9 +117,9 @@ shinyServer(function(input, output, session) {
       b <- t(colQuantiles(as.matrix(df_data()[, 1:8])))
       c <- t(colIQRs(as.matrix(df_data()[, 1:8])))
       
-      r_names <- c("Means", "Min", "25%", "Median", "75%", "Max" ,"Min IQR", "Max IQR")
+      r_names <- c("Means", "Min", "25%", "Median", "75%", "Max" ,"IQ Range")
       
-      summary_table <- matrix(rbind(a, b, c, d), nrow = 8)
+      summary_table <- data.frame(rbind(a, b, c))
       colnames(summary_table) <- c("Integrated Mean", "Integrated Standard Deviation", "Integrated Kurtosis", 
                                    "Intergrated Skew", "DMSNR Mean", "DMSNR Standard Deviation", "DMSNR Kurtosis", "DMSNR Skew")
       
@@ -126,5 +127,63 @@ shinyServer(function(input, output, session) {
       
       summary_table
     }, rownames = TRUE)
+    
+    output$kmeans_plot <- renderPlot ({
+      set.seed(800)
+      
+      plot_var <- c(input$km_sel1, input$km_sel2, "Class")
+      
+      proper_names <- c("Integrated Mean", "Integrated Standard Deviation", 
+                        "Integrated Kurtosis", "Intergrated Skew", "DMSNR Mean", 
+                        "DMSNR Standard Deviation", "DMSNR Kurtosis", "DMSNR Skew")
+      
+      km_pulsar <- kmeans(df_pulsar[ , plot_var[1:2]], input$k_clust, nstart = 20)
+      
+      #plot(df_pulsar[ , plot_var[1:2]], col = (km_pulsar$cluster + 1))
+      
+      df_kplot <- as_tibble(cbind(df_pulsar[ , plot_var], km_pulsar$cluster))
+      
+      names(df_kplot)[4] <- "cluster"
+      
+      #df_kplot %>% print()
+      
+      df_kplot %>% rename(x = plot_var[1], y = plot_var[2]) %>% 
+        ggplot(aes(x = x, y = y, col = as_factor(cluster), shape = Class)) + 
+        geom_point() + 
+        scale_color_manual(values = list("1" = dense_colors[1], 
+                                         "2" = dense_colors[2],
+                                         "3" = dense_colors[3],
+                                         "4" = dense_colors[4],
+                                         "5" = dense_colors[5],
+                                         "6" = dense_colors[6],
+                                         "7" = dense_colors[7],
+                                         "8" = dense_colors[8]),
+                           name = "Clusters") +
+        scale_shape_manual(values = list("Pulsar" = 19, 
+                                         "Non Pulsar" = 3)) +
+        theme_minimal() +
+        labs(x = proper_names[which(plot_var[1] == names(df_pulsar))], 
+             y = proper_names[which(plot_var[2] == names(df_pulsar))],
+             title = paste(proper_names[which(plot_var[2] == names(df_pulsar))], "vs",
+                           proper_names[which(plot_var[1] == names(df_pulsar))], "using",
+                           input$k_clust, "Clusters"))
+    })
+    
+    output$PCA_biplot <- renderPlot({
+      PCA_pulsar <- df_pulsar %>% dplyr::select("integ_mean":"DMSNR_skew") %>% 
+                                  prcomp(., scale = TRUE)
+      
+      ggplot_pca(PCA_pulsar, 
+                 choices = 1:2, 
+                 points_size = 1,
+                 points_alpha = 0.15,
+                 arrows = TRUE,
+                 arrows_colour = dense_colors[5],
+                 arrows_size = 2,
+                 arrows_textsize = 6,
+                 arrows_textangled = TRUE,
+                 arrows_alpha = 0.75,
+                 base_textsize = 12)
+    })
 
 })

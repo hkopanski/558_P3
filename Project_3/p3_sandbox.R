@@ -90,14 +90,29 @@ ggplot(df_pulsar2) +
                     values = dense_colors[5:8])
 ################################################################################
 library(matrixStats)
-d <- colMeans(df_pulsar[,1:8])
-a <- t(colQuantiles(as.matrix(df_pulsar[, 1:8])))
-b <- t(colRanges(as.matrix(df_pulsar[, 1:8])))
+a <- colMeans(df_pulsar[,1:8])
+b <- t(colQuantiles(as.matrix(df_pulsar[, 1:8])))
 c <- t(colIQRs(as.matrix(df_pulsar[, 1:8])))
 
-rbind(d,b,c,a)
+rbind(a, b, c)
 
 knitr::kable(summary(df_pulsar))
 ################################################################################
 
 df_pulsar %>% ggplot() + geom_boxplot(aes(x = Class, y = integ_mean))
+
+
+
+a <- colMeans(df_data()[,1:8])
+b <- t(colQuantiles(as.matrix(df_data()[, 1:8])))
+c <- t(colIQRs(as.matrix(df_data()[, 1:8])))
+
+r_names <- c("Means", "Min", "25%", "Median", "75%", "Max" ,"IQ Range")
+
+summary_table <- data.frame(rbind(a, b, c), nrow = 8)
+colnames(summary_table) <- c("Integrated Mean", "Integrated Standard Deviation", "Integrated Kurtosis", 
+                             "Intergrated Skew", "DMSNR Mean", "DMSNR Standard Deviation", "DMSNR Kurtosis", "DMSNR Skew")
+
+rownames(summary_table) <- r_names
+
+summary_table
