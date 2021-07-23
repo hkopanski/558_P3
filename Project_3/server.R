@@ -63,22 +63,39 @@ shinyServer(function(input, output, session) {
                   switch(input$df_type,
                          "A" = df_pulsar,
                          "B" = df_pulsar2)
-  }) 
+  })
+  
+  sc_ranges <- reactiveValues(x = NULL, y = NULL)
+  
+  observeEvent(input$scplot_dblclick, {
+    sc_brush <- input$scplot_brush
+    if (!is.null(sc_brush)) {
+      sc_ranges$x <- c(sc_brush$xmin, sc_brush$xmax)
+      sc_ranges$y <- c(sc_brush$ymin, sc_brush$ymax)
+      
+    } else {
+      sc_ranges$x <- NULL
+      sc_ranges$y <- NULL
+    }
+  })
+  
   output$edaPlot <- renderPlot({
         
         var1 <- which(var == input$var_sel1)
         var2 <- which(var == input$var_sel2)
       
         df_data() %>% rename(x = var[var1], y = var[var2]) %>%
-             ggplot() + geom_point(aes(x = x, y = y, col = Class), size = 0.25) + 
+             ggplot() + geom_point(aes(x = x, y = y, col = Class), size = 0.5) + 
              labs(x = proper_names1[var1], 
                   y = proper_names2[var2 - 4],
                   title = paste(proper_names2[var2 - 4],
                                 "vs" ,
                                 proper_names1[var1])) +
              theme(legend.position = c(0.9, 0.9)) +
-             scale_color_manual(values = c("Pulsar" = dense_colors[1],
-                                        "Non Pulsar" = dense_colors[7]))
+             scale_color_manual(values = c("Pulsar"     = dense_colors[1],
+                                           "Non Pulsar" = dense_colors[7])) +
+             coord_cartesian(xlim = sc_ranges$x, ylim = sc_ranges$y, expand = FALSE)
+        
        
     })
   

@@ -87,7 +87,10 @@ shinyUI(fluidPage(
                      
                      mainPanel(
                          conditionalPanel(condition = "input.plot_type == 'A'",
-                            withSpinner(plotOutput("edaPlot"), type = 5)),
+                            withSpinner(plotOutput("edaPlot", dblclick = "scplot_dblclick",
+                                                   brush = brushOpts(id = "scplot_brush", 
+                                                                     resetOnNew = TRUE)), 
+                                        type = 5)),
                          conditionalPanel(condition = "input.plot_type == 'B'",
                             h4("Density Plot for the 4 Integrated Measurements"),
                             withSpinner(plotOutput("denPlot1"), type = 5),
