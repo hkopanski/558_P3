@@ -54,8 +54,11 @@ shinyUI(fluidPage(
         ),
         tabPanel("Data",
                  sidebarLayout(
-                     sidebarPanel(sliderInput("another_number", "Random:", min = 100, max = 2500, value = 750)),
-                     mainPanel(
+                     sidebarPanel(
+                         checkboxGroupInput("var_options", "Select Variables:"," ")
+                     ),
+                 mainPanel(
+                     dataTableOutput("filterable_data_table")
                      )
                  )
         ),

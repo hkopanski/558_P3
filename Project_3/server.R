@@ -23,7 +23,7 @@ library(AMR)
 df_pulsar <- read_csv("./Data/HTRU_2.csv", col_names = FALSE)
     
 names(df_pulsar) <- c("integ_mean","integ_sd","integ_exkur","integ_skew",
-                          "DMSNR_mean","DMSNR_sd","DMSNR_exkur","DMSNR_skew","Class")
+                      "DMSNR_mean","DMSNR_sd","DMSNR_exkur","DMSNR_skew","Class")
     
 df_pulsar <- df_pulsar %>% mutate(Class = ifelse(Class == 1, "Pulsar", "Non Pulsar"))
     
@@ -33,9 +33,13 @@ df_pulsar2 <- df_pulsar %>% mutate_at(names(df_pulsar)[1:8], ~(scale(.) %>% as.v
 
 var <- names(df_pulsar)
 
+names_list <- list("integ_mean","integ_sd","integ_exkur","integ_skew",
+                   "DMSNR_mean","DMSNR_sd","DMSNR_exkur","DMSNR_skew","Class")
+
 proper_names <-  c("Integrated Mean", "Integrated Standard Deviation", 
                    "Integrated Kurtosis", "Intergrated Skew", "DMSNR Mean", 
                    "DMSNR Standard Deviation", "DMSNR Kurtosis", "DMSNR Skew")
+names(names_list) <- c(proper_names , "Class")
 
 proper_names1 <- c("Integrated Mean", "Integrated Standard Deviation", 
                   "Integrated Kurtosis", "Intergrated Skew")
@@ -64,6 +68,12 @@ shinyServer(function(input, output, session) {
                          "raw_pulsar_data" = df_pulsar,
                          "standard_pulsar_data" = df_pulsar2)
   })
+  
+  updateCheckboxGroupInput(session, "var_options", choices = names_list)
+  
+  output$filterable_data_table <- renderDataTable(
+    df_pulsar %>% datatable(filter = 'top', options = list(pageLength = 25, autoWidth = TRUE))
+  )
   
   output$downloadEDA <- downloadHandler(
     filename = function() {
