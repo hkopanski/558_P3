@@ -143,6 +143,22 @@ shinyServer(function(input, output, session) {
       summary_table
     }, rownames = TRUE)
     
+    
+    k_ranges <- reactiveValues(x = NULL, y = NULL)
+    
+    observeEvent(input$kplot_dblclick, {
+      k_brush <- input$kplot_brush
+      if (!is.null(k_brush)) {
+        k_ranges$x <- c(k_brush$xmin, k_brush$xmax)
+        k_ranges$y <- c(k_brush$ymin, k_brush$ymax)
+        
+      } else {
+        k_ranges$x <- NULL
+        k_ranges$y <- NULL
+      }
+    })
+    
+    
     output$kmeans_plot <- renderPlot ({
       set.seed(800)
       
@@ -181,8 +197,10 @@ shinyServer(function(input, output, session) {
              y = proper_names[which(plot_var[2] == names(df_pulsar))],
              title = paste(proper_names[which(plot_var[2] == names(df_pulsar))], "vs",
                            proper_names[which(plot_var[1] == names(df_pulsar))], "using",
-                           input$k_clust, "Clusters"))
+                           input$k_clust, "Clusters")) + 
+        coord_cartesian(xlim = k_ranges$x, ylim = k_ranges$y, expand = FALSE)
     })
+    
     
     
     output$PCA_biplot <- renderPlot({

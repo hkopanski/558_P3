@@ -145,7 +145,10 @@ shinyUI(fluidPage(
                                   ),
                      mainPanel(
                          conditionalPanel(condition = "input.dd_type == 'A'",
-                                          withSpinner(plotOutput("kmeans_plot"), type = 5)),
+                                          withSpinner(plotOutput("kmeans_plot", dblclick = "kplot_dblclick",
+                                                                 brush = brushOpts(id = "kplot_brush", 
+                                                                                   resetOnNew = TRUE)), 
+                                                                 type = 5)),
                          conditionalPanel(condition = "input.dd_type == 'B' & input.pca_plot_type == 'A'",
                                           withSpinner(plotOutput("PCA_biplot"), type = 5)),
                          conditionalPanel(condition = "input.dd_type == 'B' & input.pca_plot_type == 'B'",
