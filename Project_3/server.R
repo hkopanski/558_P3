@@ -69,10 +69,11 @@ shinyServer(function(input, output, session) {
                          "standard_pulsar_data" = df_pulsar2)
   })
   
-  updateCheckboxGroupInput(session, "var_options", choices = names_list)
+  updateCheckboxGroupInput(session, "var_options", choices = names_list, selected = var)
   
   output$filterable_data_table <- renderDataTable(
-    df_pulsar %>% datatable(filter = 'top', options = list(pageLength = 25, autoWidth = TRUE))
+    df_pulsar %>%
+      datatable(filter = 'top', options = list(pageLength = 25, autoWidth = TRUE))
   )
   
   output$downloadEDA <- downloadHandler(
