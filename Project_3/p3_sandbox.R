@@ -116,3 +116,11 @@ colnames(summary_table) <- c("Integrated Mean", "Integrated Standard Deviation",
 rownames(summary_table) <- r_names
 
 summary_table
+
+####################################################################################
+selection_list = list("PC1" = 1, "PC2" = 2, "PC3" = 3, "PC4" = 4,
+                      "PC5" = 5, "PC6" = 6, "PC7" = 7, "PC8" = 8)
+
+new_selection_list = selection_list[names(selection_list) %in% "PC2" == FALSE]
+
+print(new_selection_list)

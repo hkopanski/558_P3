@@ -187,8 +187,11 @@ shinyServer(function(input, output, session) {
     
     output$PCA_biplot <- renderPlot({
       
+      a_val <- length(numeric(input$PCA_pick1))
+      b_val <- length(numeric(input$PCA_pick2))
+      
       ggplot_pca(PCA_pulsar, 
-                 choices = 1:2, 
+                 choices = c(a_val, b_val), 
                  points_size = 1,
                  points_alpha = 0.15,
                  arrows = TRUE,
@@ -235,5 +238,14 @@ shinyServer(function(input, output, session) {
     output$PCA_tab <- renderTable({
       PCA_tab
     }, rownames = TRUE)
+    
+    observeEvent(input$PCA_pick1, {
+      selection_list = list("PC1" = 1, "PC2" = 2, "PC3" = 3, "PC4" = 4,
+                            "PC5" = 5, "PC6" = 6, "PC7" = 7, "PC8" = 8)
+      
+      new_selection_list = selection_list[-length(numeric(input$PCA_pick1))]
+      
+      updateSelectInput(session, "PCA_pick2", choices = new_selection_list)
+    })
 
 })

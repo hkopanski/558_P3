@@ -69,17 +69,17 @@ shinyUI(fluidPage(
                          h4("Choose Variables Below for Scatterplot"),
                          br(),
                          selectInput("var_sel1", "First Variable to Plot (X Axis)", 
-                                                                                list("Integrated Mean" = "integ_mean", 
-                                                                                "Integrated Standard Deviation" = "integ_sd", 
-                                                                                "Integrated Kurtosis" = "integ_exkur", 
-                                                                                "Intergrated Skew" = "integ_skew"), 
+                                     list("Integrated Mean" = "integ_mean", 
+                                          "Integrated Standard Deviation" = "integ_sd", 
+                                          "Integrated Kurtosis" = "integ_exkur", 
+                                          "Intergrated Skew" = "integ_skew"), 
                                      selected = "Integrated Mean"),
                          
                          selectInput("var_sel2", "Second Variable to Plot (Y Axis)", 
-                                                                                 list("DMSNR Mean" = "DMSNR_mean", 
-                                                                                 "DMSNR Standard Deviation" = "DMSNR_sd", 
-                                                                                 "DMSNR Kurtosis" = "DMSNR_exkur", 
-                                                                                 "DMSNR Skew" = "DMSNR_skew"), 
+                                      list("DMSNR Mean" = "DMSNR_mean", 
+                                           "DMSNR Standard Deviation" = "DMSNR_sd", 
+                                           "DMSNR Kurtosis" = "DMSNR_exkur", 
+                                           "DMSNR Skew" = "DMSNR_skew"), 
                                      selected = "DMSNR Mean"),
                      )
                      
@@ -96,7 +96,7 @@ shinyUI(fluidPage(
                          conditionalPanel(condition = "input.plot_type == 'C'",
                             h4("Pairs Plot for Pulsar Data"),
                             withSpinner(plotOutput("pairsPlot"),type = 5)),                  
-                         tableOutput("information")
+                         withSpinner(tableOutput("information"), type = 5)
                      )
                  )
         ),
@@ -126,7 +126,22 @@ shinyUI(fluidPage(
                                                                 list("Biplot" = "A",
                                                                      "Screeplot" = "B",
                                                                      "Screeplot (Cumulative)" = "C")),
-                                  )
+                                  ),
+                                  br(),
+                                  conditionalPanel(condition = "input.dd_type == 'B' & input.pca_plot_type == 'A'",
+                                                   selectInput("PCA_pick1", "Choose a Principal Component",
+                                                               list("PC1" = 1,
+                                                                    "PC2" = 2,
+                                                                    "PC3" = 3,
+                                                                    "PC4" = 4,
+                                                                    "PC5" = 5,
+                                                                    "PC6" = 6,
+                                                                    "PC7" = 7,
+                                                                    "PC8" = 8), selected = "PC1"),
+                                                   br(),
+                                                   selectInput("PCA_pick2", "Choose a 2nd Principal Component",
+                                                               "", selected = "PC2"),
+                                  ),
                                   ),
                      mainPanel(
                          conditionalPanel(condition = "input.dd_type == 'A'",
@@ -139,6 +154,7 @@ shinyUI(fluidPage(
                                           withSpinner(plotOutput("PCA_scree_cum"), type = 5)),
                          conditionalPanel(condition = "input.dd_type == 'B'",
                                           withSpinner(tableOutput("PCA_tab"), type = 5)),
+                         verbatimTextOutput("PCA_text")
                      )
                  )
         ),
