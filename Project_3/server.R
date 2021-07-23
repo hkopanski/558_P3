@@ -61,9 +61,18 @@ colnames(df_pca_plot) <- c("PCA", "variance")
 shinyServer(function(input, output, session) {
   df_data <- reactive({
                   switch(input$df_type,
-                         "A" = df_pulsar,
-                         "B" = df_pulsar2)
+                         "raw_pulsar_data" = df_pulsar,
+                         "standard_pulsar_data" = df_pulsar2)
   })
+  
+  output$downloadEDA <- downloadHandler(
+    filename = function() {
+      paste(input$df_type, ".csv", sep = "")
+    },
+    content = function(file) {
+      write.csv(df_data(), file, row.names = FALSE)
+    }
+  )
   
   sc_ranges <- reactiveValues(x = NULL, y = NULL)
   

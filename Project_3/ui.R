@@ -61,8 +61,8 @@ shinyUI(fluidPage(
                          br(),
                          radioButtons("df_type",
                                       "Select Data Type",
-                                      list("Raw" = "A",
-                                           "Standardized" = "B")),
+                                      list("Raw" = "raw_pulsar_data",
+                                           "Standardized" = "standard_pulsar_data")),
                          br(),
                          conditionalPanel(condition = "input.plot_type == 'A'",
                          br(),                  
@@ -80,9 +80,9 @@ shinyUI(fluidPage(
                                            "DMSNR Standard Deviation" = "DMSNR_sd", 
                                            "DMSNR Kurtosis" = "DMSNR_exkur", 
                                            "DMSNR Skew" = "DMSNR_skew"), 
-                                     selected = "DMSNR Mean"),
-                     )
-                     
+                                     selected = "DMSNR Mean")),
+                         downloadButton("downloadEDA", "Download data used in this Section")
+                         
                      ),
                      
                      mainPanel(
