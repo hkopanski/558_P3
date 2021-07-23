@@ -45,6 +45,20 @@ shinyUI(fluidPage(
     titlePanel("Pulsar Classification"),
     
     tabsetPanel(
+        tabPanel("About",
+                 sidebarLayout(
+                     sidebarPanel(sliderInput("some_number", "Random:", min = 10, max = 250, value = 75)),
+                     mainPanel(
+                     )
+                 )
+        ),
+        tabPanel("Data",
+                 sidebarLayout(
+                     sidebarPanel(sliderInput("another_number", "Random:", min = 100, max = 2500, value = 750)),
+                     mainPanel(
+                     )
+                 )
+        ),
         tabPanel("Exporatory Data Analysis",
                  sidebarLayout(
                      sidebarPanel(
