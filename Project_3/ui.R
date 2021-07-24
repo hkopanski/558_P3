@@ -21,8 +21,11 @@ library(AMR)
 
 df_pulsar <- read_csv("./Data/HTRU_2.csv", col_names = FALSE)
 
-names(df_pulsar) <- c("integ_mean","integ_sd","integ_exkur","integ_skew",
-                      "DMSNR_mean","DMSNR_sd","DMSNR_exkur","DMSNR_skew","Class")
+var <- c("integ_mean","integ_sd","integ_exkur","integ_skew",
+         "DMSNR_mean","DMSNR_sd","DMSNR_exkur","DMSNR_skew",
+         "Class")
+
+names(df_pulsar) <- var
 
 df_pulsar <- df_pulsar %>% 
     mutate(Class = ifelse(Class == 1, "Pulsar", "Non Pulsar"))
@@ -38,6 +41,12 @@ proper_names <- c("Integrated Mean", "Integrated Standard Deviation",
                   "DMSNR Mean", "DMSNR Standard Deviation", "DMSNR Kurtosis",
                   "DMSNR Skew")
 
+names_list <- list("integ_mean","integ_sd","integ_exkur","integ_skew",
+                   "DMSNR_mean","DMSNR_sd","DMSNR_exkur","DMSNR_skew",
+                   "Class")
+
+names(names_list) <- c(proper_names , "Class")
+
 options(spinner.color="#003f5c", spinner.color.background="#ffffff", spinner.size=2)
 
 shinyUI(fluidPage(
@@ -46,15 +55,23 @@ shinyUI(fluidPage(
     
     tabsetPanel(
         tabPanel("About",
-                 sidebarLayout(
-                     sidebarPanel(sliderInput("some_number", "Random:", min = 10, max = 250, value = 75)),
-                     mainPanel(
-                     )
+                mainPanel(
+                    h3("Pulsars and how they are measured"),
+                    br(),
+                    p("Pulsars are a type of fast spinnig and highly active form of a neutron star."),
+                    imageOutput("pulsar_image"),
+                    p("Source of image: https://www.esa.int/ESA_Multimedia/Images/2003/05/NGC_1952_Crab_Nebula_pulsar_imaged_by_the_NASA_ESA_Hubble_Space_Telescope"),
+                    br(),
+                    p("Thier spin can be measured and recorded. The purpose of this app is to be able to classify pulsars from non pulsar neutron stars.")
                  )
         ),
         tabPanel("Data",
                  sidebarLayout(
                      sidebarPanel(
+                         h3("Interactive Data Table"),
+                         p("Table can be filtered on variable values by \n using the slider popup under the variable name"),
+                         br(),
+                         p("Select which variables to view in the table"),
                          checkboxGroupInput("var_options", "Select Variables:"," ")
                      ),
                  mainPanel(
@@ -183,8 +200,51 @@ shinyUI(fluidPage(
         ),
         tabPanel("Modeling the Data",
                  sidebarLayout(
-                     sidebarPanel(sliderInput("year", "Year:", min = 1968, max = 2009, value = 2009, sep='')),
+                     sidebarPanel(
+                         checkboxGroupInput("mod_var_opt", "Select Variables for Model Fitting:", 
+                                            names_list[1:8], selected = var[1:8]),
+                         numericInput("train_split", "Training Data Split", 
+                                      min = 0, max = 1, step = 0.05, value = 0.5),
+                         numericInput("seed_set", "Set Seed Value", 
+                                      min = 1, step = 1, value = 100),
+                         numericInput("pop_redux", "Data Reduction Multiplier \n 
+                                      (choosing 1 will use all available data)", 
+                                      min = 0, max = 1, step = 0.05, value = 0.1),
+                         actionButton("model_prep", "Create Test and Train splits"),
+                         br(),
+                         br(),
+                         selectInput("method_opt", "Cross-Validation Methods", list("Repeat CV" = "repeatedcv",
+                                                                                    "CV" = "cv",
+                                                                                    "LOOCV" = "LOOCV")),
+                         numericInput("k_fold", "K folds for Cross Validation", 
+                                      min = 1, max = 10, value = 5, step = 1),
+                         numericInput("cv_repeats", "Number of Repeats", 
+                                      min = 1, max = 5, value = 2, step = 1),
+                         br(),
+                         h3("Model Arguments"),
+                         numericInput("log_thresh", "Logistic Probability Threshhold", 
+                                      min = 0, max = 1, step = 0.05, value = 0.5),
+                         numericInput("max_k", "Maximum K value for KNN", 
+                                      min = 2, max = 25, value = 10, step = 1),
+                         numericInput("max_mtry", "Maximum Number of Variables for Random Forest", 
+                                      min = 1, max = 8, value = 8, step = 1),
+                         p("Using a maximum of 8 variables produces a bagging model"),
+                         br(),
+                         checkboxGroupInput("model_sel", "Select Models to be created", list("Logistic Regression" = "glm",
+                                                                                             "KNN Analysis" = "knn",
+                                                                                             "Ensemble Method" = "rf"),
+                                            selected = c("glm", "knn", "rf")),
+                         actionButton("run_model", "Create Models")
+                         ),
                      mainPanel(
+                         tabsetPanel(type = "tabs",
+                                     tabPanel("Model Information", 
+                                              p("There will be information here")),
+                                     tabPanel("Model Fitting", 
+                                              p("There will be information here")),
+                                     tabPanel("Prediction on Test Data", 
+                                              p("There will be information here"))
+                         )
                  )
              )
         )

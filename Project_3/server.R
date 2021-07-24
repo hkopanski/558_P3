@@ -21,9 +21,12 @@ library(AMR)
 
 
 df_pulsar <- read_csv("./Data/HTRU_2.csv", col_names = FALSE)
+
+var <- c("integ_mean","integ_sd","integ_exkur","integ_skew",
+         "DMSNR_mean","DMSNR_sd","DMSNR_exkur","DMSNR_skew",
+         "Class")
     
-names(df_pulsar) <- c("integ_mean","integ_sd","integ_exkur","integ_skew",
-                      "DMSNR_mean","DMSNR_sd","DMSNR_exkur","DMSNR_skew","Class")
+names(df_pulsar) <- var
     
 df_pulsar <- df_pulsar %>% mutate(Class = ifelse(Class == 1, "Pulsar", "Non Pulsar"))
     
@@ -31,14 +34,14 @@ df_pulsar$Class <- as.factor(df_pulsar$Class)
 
 df_pulsar2 <- df_pulsar %>% mutate_at(names(df_pulsar)[1:8], ~(scale(.) %>% as.vector))
 
-var <- names(df_pulsar)
-
 names_list <- list("integ_mean","integ_sd","integ_exkur","integ_skew",
-                   "DMSNR_mean","DMSNR_sd","DMSNR_exkur","DMSNR_skew","Class")
+                   "DMSNR_mean","DMSNR_sd","DMSNR_exkur","DMSNR_skew",
+                   "Class")
 
 proper_names <-  c("Integrated Mean", "Integrated Standard Deviation", 
                    "Integrated Kurtosis", "Intergrated Skew", "DMSNR Mean", 
                    "DMSNR Standard Deviation", "DMSNR Kurtosis", "DMSNR Skew")
+
 names(names_list) <- c(proper_names , "Class")
 
 proper_names1 <- c("Integrated Mean", "Integrated Standard Deviation", 
@@ -49,6 +52,9 @@ proper_names2 <- c("DMSNR Mean", "DMSNR Standard Deviation", "DMSNR Kurtosis",
 
 dense_colors <- c("#003f5c", "#2f4b7c", "#665191", "#a05195", 
                   "#d45087", "#f95d6a", "#ff7c43", "#ffa600")
+
+kplot_colors <- c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3",
+                  "#ff7f00", "#ffff33", "#a65628", "#f781bf")
 
 PCA_pulsar <- df_pulsar %>% dplyr::select("integ_mean":"DMSNR_skew") %>% 
   prcomp(., scale = TRUE)
@@ -63,18 +69,33 @@ colnames(df_pca_plot) <- c("PCA", "variance")
 ##################################################################################
 
 shinyServer(function(input, output, session) {
+  
+  output$pulsar_image <- renderImage({ 
+    return(list(src = "./Data/crab_pulsar.png",
+                contentType = "image/png",
+                width = 300,
+                height = 300)
+           )
+  })
+  
   df_data <- reactive({
                   switch(input$df_type,
                          "raw_pulsar_data" = df_pulsar,
                          "standard_pulsar_data" = df_pulsar2)
   })
   
-  updateCheckboxGroupInput(session, "var_options", choices = names_list, selected = var)
+  updateCheckboxGroupInput(session, "var_options", 
+                           choices = names_list, selected = var)
+  
+  output$dynamic_value <- renderPrint({
+    is.vector(input$var_options)
+  })
   
   output$filterable_data_table <- renderDataTable(
-    df_pulsar %>%
-      datatable(filter = 'top', options = list(pageLength = 25, autoWidth = TRUE))
-  )
+      datatable(df_pulsar[ , input$var_options, drop = FALSE], 
+                filter = 'top', options = list(pageLength = 25, autoWidth = TRUE)
+                )
+    )
   
   output$downloadEDA <- downloadHandler(
     filename = function() {
@@ -172,8 +193,7 @@ shinyServer(function(input, output, session) {
       r_names <- c("Means", "Min", "25%", "Median", "75%", "Max" ,"IQ Range")
       
       summary_table <- data.frame(rbind(a, b, c))
-      colnames(summary_table) <- c("Integrated Mean", "Integrated Standard Deviation", "Integrated Kurtosis", 
-                                   "Intergrated Skew", "DMSNR Mean", "DMSNR Standard Deviation", "DMSNR Kurtosis", "DMSNR Skew")
+      colnames(summary_table) <- proper_names
       
       rownames(summary_table) <- r_names
       
@@ -201,13 +221,7 @@ shinyServer(function(input, output, session) {
       
       plot_var <- c(input$km_sel1, input$km_sel2, "Class")
       
-      proper_names <- c("Integrated Mean", "Integrated Standard Deviation", 
-                        "Integrated Kurtosis", "Intergrated Skew", "DMSNR Mean", 
-                        "DMSNR Standard Deviation", "DMSNR Kurtosis", "DMSNR Skew")
-      
-      km_pulsar <- kmeans(df_pulsar[ , plot_var[1:2]], input$k_clust, nstart = 20)
-      
-      #plot(df_pulsar[ , plot_var[1:2]], col = (km_pulsar$cluster + 1))
+      km_pulsar <- kmeans(df_pulsar[ , 1:8], input$k_clust, nstart = 20, iter.max = 50)
       
       df_kplot <- as_tibble(cbind(df_pulsar[ , plot_var], km_pulsar$cluster))
       
@@ -218,18 +232,18 @@ shinyServer(function(input, output, session) {
       df_kplot %>% rename(x = plot_var[1], y = plot_var[2]) %>% 
         ggplot(aes(x = x, y = y, col = as_factor(cluster), shape = Class)) + 
         geom_point() + 
-        scale_color_manual(values = list("1" = dense_colors[1], 
-                                         "2" = dense_colors[2],
-                                         "3" = dense_colors[3],
-                                         "4" = dense_colors[4],
-                                         "5" = dense_colors[5],
-                                         "6" = dense_colors[6],
-                                         "7" = dense_colors[7],
-                                         "8" = dense_colors[8]),
+        scale_color_manual(values = list("1" = kplot_colors[1], 
+                                         "2" = kplot_colors[2],
+                                         "3" = kplot_colors[3],
+                                         "4" = kplot_colors[4],
+                                         "5" = kplot_colors[5],
+                                         "6" = "black",
+                                         "7" = kplot_colors[7],
+                                         "8" = kplot_colors[8]),
                            name = "Clusters") +
         scale_shape_manual(values = list("Pulsar" = 19, 
                                          "Non Pulsar" = 3)) +
-        theme_minimal() +
+        #theme_minimal() +
         labs(x = proper_names[which(plot_var[1] == names(df_pulsar))], 
              y = proper_names[which(plot_var[2] == names(df_pulsar))],
              title = paste(proper_names[which(plot_var[2] == names(df_pulsar))], "vs",
