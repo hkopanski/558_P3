@@ -220,6 +220,7 @@ shinyUI(fluidPage(
                                       min = 1, max = 10, value = 5, step = 1),
                          numericInput("cv_repeats", "Number of Repeats", 
                                       min = 1, max = 5, value = 2, step = 1),
+                         actionButton("tc_update", "Update Train Control Parameters", class = "btn-success"),
                          br(),
                          h3("Model Arguments"),
                          numericInput("log_thresh", "Logistic Probability Threshhold", 
@@ -234,16 +235,18 @@ shinyUI(fluidPage(
                                                                                              "KNN Analysis" = "knn",
                                                                                              "Ensemble Method" = "rf"),
                                             selected = c("glm", "knn", "rf")),
-                         actionButton("run_model", "Create Models")
+                         actionButton("run_model", "Create Models", class = "btn-success")
                          ),
                      mainPanel(
                          tabsetPanel(type = "tabs",
                                      tabPanel("Model Information", 
                                               p("There will be information here")),
                                      tabPanel("Model Fitting", 
+                                              verbatimTextOutput("trnctrl"),
                                               verbatimTextOutput("train_rows"),
-                                              verbatimTextOutput("redux_rows"),
-                                              dataTableOutput("pulsarTrain")),
+                                              dataTableOutput("pulsar_redux"),
+                                              withSpinner(verbatimTextOutput("logFit"), type = 5),
+                                              withSpinner(verbatimTextOutput("knnFit"), type = 5)),
                                      tabPanel("Prediction on Test Data", 
                                               p("There will be information here"))
                          )

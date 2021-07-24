@@ -76,7 +76,7 @@ shinyServer(function(input, output, session) {
                 width = 300,
                 height = 300)
            )
-  })
+  }, deleteFile = FALSE)
   
   df_data <- reactive({
                   switch(input$df_type,
@@ -322,7 +322,7 @@ shinyServer(function(input, output, session) {
     df_redux <- eventReactive(input$model_prep, {
       set.seed(input$seed_set)
       df_pulsar[sample(1:nrow(df_pulsar), size = nrow(df_pulsar) * input$pop_redux),
-                input$mod_var_opt, drop = FALSE]
+                c(input$mod_var_opt, "Class"), drop = FALSE]
     })
   
     training <- eventReactive(input$model_prep, {
@@ -343,17 +343,44 @@ shinyServer(function(input, output, session) {
       df_redux()[testing() ,]
     })
     
+    train_ctrl <- eventReactive(input$tc_update, {
+      trainControl(method = input$method_opt, 
+                   number = input$k_fold, 
+                   repeats = input$cv_repeats)
+    })
     
-    
-    output$redux_rows <- renderPrint({
+    log_fit <- eventReactive(input$run_model, {
       
-      if (is.null(df_redux())){
+      set.seed(input$seed_set)
+      
+      train(Class ~ .,
+            method = "glm", 
+            family = "binomial", 
+            data = df_train(), 
+            trControl = train_ctrl())
+    })
+    
+    knn_fit <- eventReactive(input$run_model, {
+      
+      set.seed(input$seed_set)
+      
+      train(Class ~ ., 
+            data = df_train(),
+            method = "knn", 
+            trControl = train_ctrl(), 
+            preProcess = c("center", "scale"), 
+            tuneGrid = data.frame(k = 2:input$max_k))
+    })
+    
+    output$trnctrl <- renderPrint({
+      
+      if (is.null(train_ctrl())){
         
         return()
         
         } else {
           
-      nrow(df_redux())
+      paste("Method:", train_ctrl()$method, "|","Number of K folds:", train_ctrl()$number, "|","Number of Repeats",train_ctrl()$repeats)
       
         }
           
@@ -373,7 +400,7 @@ shinyServer(function(input, output, session) {
       
     })
     
-    output$pulsarTrain <- renderDataTable({
+    output$pulsar_redux <- renderDataTable({
       if (is.null(df_redux())){
         
         return()
@@ -381,6 +408,34 @@ shinyServer(function(input, output, session) {
       } else {
         
         df_redux()
+        
+      }
+      
+    }, options = list(pageLength = 5, autoWidth = TRUE))
+    
+    output$logFit <- renderPrint({
+      
+      if (is.null(log_fit())){
+        
+        return()
+        
+      } else {
+        
+        log_fit()
+        
+      }
+      
+    })
+    
+    output$knnFit <- renderPrint({
+      
+      if (is.null(knn_fit())){
+        
+        return()
+        
+      } else {
+        
+        knn_fit()
         
       }
       

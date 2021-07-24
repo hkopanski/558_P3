@@ -124,3 +124,24 @@ selection_list = list("PC1" = 1, "PC2" = 2, "PC3" = 3, "PC4" = 4,
 new_selection_list = selection_list[names(selection_list) %in% "PC2" == FALSE]
 
 print(new_selection_list)
+
+##################################################################################
+set.seed(1)
+
+df_redux <- df_pulsar[sample(1:nrow(df_pulsar), size = nrow(df_pulsar) * 0.1),  c(1:3, 9)]
+
+training <- sample(1:nrow(df_redux), size = nrow(df_redux) * 0.5)
+testing <- dplyr::setdiff(1:nrow(df_redux), training)
+pulsarTrain <- df_redux[training, ]
+pulsarTest <- df_redux[testing, ]
+
+trctrl <- trainControl(method = "repeatedcv", 
+                       number = 5, 
+                       repeats = 2)
+
+log_fit <- train(Class ~ ., 
+                 method = "glm", 
+                 family = "binomial", 
+                 data = pulsarTrain, 
+                 trControl = trctrl)
+log_fit
