@@ -210,7 +210,7 @@ shinyUI(fluidPage(
                          numericInput("pop_redux", "Data Reduction Multiplier \n 
                                       (choosing 1 will use all available data)", 
                                       min = 0, max = 1, step = 0.05, value = 0.1),
-                         actionButton("model_prep", "Create Test and Train splits"),
+                         actionButton("model_prep", "Create Test and Train splits", class = "btn-success"),
                          br(),
                          br(),
                          selectInput("method_opt", "Cross-Validation Methods", list("Repeat CV" = "repeatedcv",
@@ -241,7 +241,9 @@ shinyUI(fluidPage(
                                      tabPanel("Model Information", 
                                               p("There will be information here")),
                                      tabPanel("Model Fitting", 
-                                              p("There will be information here")),
+                                              verbatimTextOutput("train_rows"),
+                                              verbatimTextOutput("redux_rows"),
+                                              dataTableOutput("pulsarTrain")),
                                      tabPanel("Prediction on Test Data", 
                                               p("There will be information here"))
                          )

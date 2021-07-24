@@ -309,12 +309,81 @@ shinyServer(function(input, output, session) {
     }, rownames = TRUE)
     
     observeEvent(input$PCA_pick1, {
-      selection_list = list("PC1" = 1, "PC2" = 2, "PC3" = 3, "PC4" = 4,
-                            "PC5" = 5, "PC6" = 6, "PC7" = 7, "PC8" = 8)
+      selection_list <- list("PC1" = 1, "PC2" = 2, "PC3" = 3, "PC4" = 4,
+                             "PC5" = 5, "PC6" = 6, "PC7" = 7, "PC8" = 8)
       
-      new_selection_list = selection_list[-length(numeric(input$PCA_pick1))]
+      new_selection_list <- selection_list[-length(numeric(input$PCA_pick1))]
       
       updateSelectInput(session, "PCA_pick2", choices = new_selection_list)
+    })
+    
+    #Model Fitting Section
+    
+    df_redux <- eventReactive(input$model_prep, {
+      set.seed(input$seed_set)
+      df_pulsar[sample(1:nrow(df_pulsar), size = nrow(df_pulsar) * input$pop_redux),
+                input$mod_var_opt, drop = FALSE]
+    })
+  
+    training <- eventReactive(input$model_prep, {
+      set.seed(input$seed_set)
+      sample(1:nrow(df_redux()), size = nrow(df_redux()) * input$train_split)
+      })
+    
+    testing <- eventReactive(input$model_prep, {
+      set.seed(input$seed_set)
+      dplyr::setdiff(1:nrow(df_redux()), training())
+    })
+    
+    df_train <- eventReactive(input$model_prep, {
+      df_redux()[training() ,]
+    })
+    
+    df_test <- eventReactive(input$model_prep, {
+      df_redux()[testing() ,]
+    })
+    
+    
+    
+    output$redux_rows <- renderPrint({
+      
+      if (is.null(df_redux())){
+        
+        return()
+        
+        } else {
+          
+      nrow(df_redux())
+      
+        }
+          
+    })
+    
+    output$train_rows <- renderPrint({
+      
+      if (is.null(training())){
+        
+        return()
+        
+      } else {
+        
+        length(training())
+        
+      }
+      
+    })
+    
+    output$pulsarTrain <- renderDataTable({
+      if (is.null(df_redux())){
+        
+        return()
+        
+      } else {
+        
+        df_redux()
+        
+      }
+      
     })
 
 })
