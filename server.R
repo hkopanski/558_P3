@@ -9,7 +9,7 @@
 
 library(shiny)
 library(tidyverse)
-library(maps)
+library(shinythemes)
 library(forcats)
 library(MASS)
 library(caret)
