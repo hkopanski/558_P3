@@ -18,6 +18,20 @@ library(shinycssloaders)   - version 1.0.0
 library(AMR)               - version 1.7.1
 ```
 
+Running the following code will check for and install the required libraries if necessary:
+
+
+packages <- c(
+
+libraries <- function(packages){
+  for(i in packages){
+    if(!require(package, character.only = TRUE)){
+      install.packages(package, dependencies = TRUE)
+      library(package, character.only = TRUE)
+    }
+  }
+}
+
 To run this application directly from github, run the following in an R session:
 
 `shiny::runGitHub('hkopanski/558_P3', ref = 'main')`
