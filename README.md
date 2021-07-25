@@ -18,4 +18,4 @@ library(AMR)               - version 1.7.1`
 
 To run this application directly from github, run the following in an R session:
 
-shiny::runGitHub('hkopanski/558_P3', ref = 'main')
+`shiny::runGitHub('hkopanski/558_P3', ref = 'main')`
