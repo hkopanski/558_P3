@@ -99,13 +99,13 @@ shinyServer(function(input, output, session) {
   
   output$downloadEDA <- downloadHandler(
     filename = function() {
-      paste(input$df_type, ".csv", sep = "")
+      paste0(input$df_type, ".csv")
     },
     content = function(file) {
       write.csv(df_data(), file, row.names = FALSE)
     }
   )
-  
+
   sc_ranges <- reactiveValues(x = NULL, y = NULL)
   
   observeEvent(input$scplot_dblclick, {
@@ -120,28 +120,28 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  scatter_plot <- reactive({
+    var1 <- which(var == input$var_sel1)
+    var2 <- which(var == input$var_sel2)
+    
+    df_data() %>% rename(x = var[var1], y = var[var2]) %>%
+      ggplot() + geom_point(aes(x = x, y = y, col = Class), size = 0.5) + 
+      labs(x = proper_names1[var1], 
+           y = proper_names2[var2 - 4],
+           title = paste(proper_names2[var2 - 4],
+                         "vs" ,
+                         proper_names1[var1])) +
+      theme(legend.position = c(0.9, 0.9)) +
+      scale_color_manual(values = c("Pulsar"     = dense_colors[1],
+                                    "Non Pulsar" = dense_colors[7])) +
+      coord_cartesian(xlim = sc_ranges$x, ylim = sc_ranges$y, expand = FALSE)
+  })
+  
   output$edaPlot <- renderPlot({
-        
-        var1 <- which(var == input$var_sel1)
-        var2 <- which(var == input$var_sel2)
-      
-        df_data() %>% rename(x = var[var1], y = var[var2]) %>%
-             ggplot() + geom_point(aes(x = x, y = y, col = Class), size = 0.5) + 
-             labs(x = proper_names1[var1], 
-                  y = proper_names2[var2 - 4],
-                  title = paste(proper_names2[var2 - 4],
-                                "vs" ,
-                                proper_names1[var1])) +
-             theme(legend.position = c(0.9, 0.9)) +
-             scale_color_manual(values = c("Pulsar"     = dense_colors[1],
-                                           "Non Pulsar" = dense_colors[7])) +
-             coord_cartesian(xlim = sc_ranges$x, ylim = sc_ranges$y, expand = FALSE)
-        
-       
+    scatter_plot()
     })
   
-  output$denPlot1 <- renderPlot({
-    
+  density_integ <- reactive({ 
     ggplot(df_data()) +
       geom_density(aes(x = integ_mean, fill = dense_colors[1]), alpha = .2) +
       geom_density(aes(x = integ_sd, fill = dense_colors[2]), alpha = .2) +
@@ -153,11 +153,15 @@ shinyServer(function(input, output, session) {
       scale_fill_manual(guide = guide_legend(), name =  "Integrated \nReadings",  
                         labels = c("Mean", "Standard Deviation","Kurtosis", "Skew"),
                         values = dense_colors[1:4])
+    })
+  
+  output$denPlot1 <- renderPlot({
+    
+    density_integ()
     
   })
   
-  output$denPlot2 <- renderPlot({
-    
+  density_DMSNR <- reactive({
     ggplot(df_data()) +
       geom_density(aes(x = DMSNR_mean, fill = dense_colors[5]), alpha = .2) +
       geom_density(aes(x = DMSNR_sd, fill = dense_colors[6]), alpha = .2) +
@@ -169,13 +173,65 @@ shinyServer(function(input, output, session) {
       scale_fill_manual(guide = guide_legend(), name =  "DM-SNR \nReadings",  
                         labels = c("Mean", "Standard Deviation","Kurtosis", "Skew"), 
                         values = dense_colors[5:8])
+  })
+  
+  output$denPlot2 <- renderPlot({
+    
+    density_DMSNR()
     
   })
   
+  pairs_plot <- reactive({ ggpairs(df_data(), mapping = ggplot2::aes(color = Class)) })
+  
   output$pairsPlot <- renderPlot({
-    ggpairs(df_data(), mapping = ggplot2::aes(color = Class))
-  })
     
+    pairs_plot()
+    
+  })
+
+  ###############################################################
+  output$downloadPlot1 <- downloadHandler(
+    filename = function() {
+      paste("plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      ggsave(file, plot = scatter_plot(), device = "png")
+    },
+    contentType = "image/png"
+  )
+  
+  output$downloadPlot2 <- downloadHandler(
+    filename = function() {
+      paste("plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      ggsave(file, plot = density_integ(), device = "png")
+    },
+    contentType = "image/png"
+  )
+  
+  output$downloadPlot3 <- downloadHandler(
+    filename = function() {
+      paste("plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      ggsave(file, plot = density_DMSNR(), device = "png")
+    },
+    contentType = "image/png"
+  )
+  
+  output$downloadPlot4 <- downloadHandler(
+    filename = function() {
+      paste("plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      ggsave(file, plot = pairs_plot(), device = "png")
+    },
+    contentType = "image/png"
+  )
+
+  ###############################################################  
+      
   output$small_tab <- renderDataTable({
       
             if(input$df_type == "A"){df_data = df_pulsar} else {df_data = df_pulsar2 }
@@ -372,6 +428,18 @@ shinyServer(function(input, output, session) {
             tuneGrid = data.frame(k = 2:input$max_k))
     })
     
+    rf_fit <- eventReactive(input$run_model, {
+      
+      set.seed(input$seed_set)
+      
+      train(Class ~ ., 
+            data = df_train(), 
+            method = 'rf',
+            preProcess = c('center', 'scale'), 
+            importance = TRUE,
+            tuneGrid = data.frame(mtry = 1:input$max_mtry))
+    })
+    
     output$trnctrl <- renderPrint({
       
       if (is.null(train_ctrl())){
@@ -394,7 +462,7 @@ shinyServer(function(input, output, session) {
         
       } else {
         
-        length(training())
+        paste("The number of rows in the training set is", length(training()))
         
       }
       
@@ -436,6 +504,20 @@ shinyServer(function(input, output, session) {
       } else {
         
         knn_fit()
+        
+      }
+      
+    })
+    
+    output$rfFit <- renderPrint({
+      
+      if (is.null(rf_fit())){
+        
+        return()
+        
+      } else {
+        
+        rf_fit()
         
       }
       

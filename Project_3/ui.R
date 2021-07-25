@@ -9,7 +9,7 @@
 
 library(shiny)
 library(tidyverse)
-library(maps)
+library(shinythemes)
 library(forcats)
 library(MASS)
 library(caret)
@@ -47,10 +47,10 @@ names_list <- list("integ_mean","integ_sd","integ_exkur","integ_skew",
 
 names(names_list) <- c(proper_names , "Class")
 
-options(spinner.color="#003f5c", spinner.color.background="#ffffff", spinner.size=2)
+options(spinner.color="#D5220F", spinner.color.background="#ffffff", spinner.size=2)
 
 shinyUI(fluidPage(
-    
+    theme = shinytheme("simplex"),
     titlePanel("Pulsar Classification"),
     
     tabsetPanel(
@@ -115,8 +115,16 @@ shinyUI(fluidPage(
                                            "DMSNR Kurtosis" = "DMSNR_exkur", 
                                            "DMSNR Skew" = "DMSNR_skew"), 
                                      selected = "DMSNR Mean")),
-                         downloadButton("downloadEDA", "Download data used in this Section")
-                         
+                         downloadButton("downloadEDA", "Download data used in this Section"),
+                         br(),
+                         conditionalPanel(condition = "input.plot_type == 'A'",
+                                          downloadButton("downloadPlot1", "Download plot (Scatter)")),
+                         conditionalPanel(condition = "input.plot_type == 'B'",
+                                          downloadButton("downloadPlot2", "Download Density Plot (integration)"),
+                                          downloadButton("downloadPlot3", "Download plot (DM-SNR)")),
+                         conditionalPanel(condition = "input.plot_type == 'C'",
+                                          downloadButton("downloadPlot4", "Download Density Plot (Pairs)"),
+                                          p("Click once and please wait, pairs plot download takes a moment to prepare"))
                      ),
                      
                      mainPanel(
@@ -231,10 +239,10 @@ shinyUI(fluidPage(
                                       min = 1, max = 8, value = 8, step = 1),
                          p("Using a maximum of 8 variables produces a bagging model"),
                          br(),
-                         checkboxGroupInput("model_sel", "Select Models to be created", list("Logistic Regression" = "glm",
-                                                                                             "KNN Analysis" = "knn",
-                                                                                             "Ensemble Method" = "rf"),
-                                            selected = c("glm", "knn", "rf")),
+                         radioButtons("model_sel", "Select Models to be created", list("Logistic Regression" = "glm",
+                                                                                       "KNN Analysis" = "knn",
+                                                                                       "Ensemble Method" = "rf"),
+                                            selected = c("glm")),
                          actionButton("run_model", "Create Models", class = "btn-success")
                          ),
                      mainPanel(
@@ -242,11 +250,15 @@ shinyUI(fluidPage(
                                      tabPanel("Model Information", 
                                               p("There will be information here")),
                                      tabPanel("Model Fitting", 
-                                              verbatimTextOutput("trnctrl"),
-                                              verbatimTextOutput("train_rows"),
+                                              
+                                              h3("This is the data that will be used for model training"),
                                               dataTableOutput("pulsar_redux"),
+                                              verbatimTextOutput("train_rows"),
+                                              verbatimTextOutput("trnctrl"),
                                               withSpinner(verbatimTextOutput("logFit"), type = 5),
-                                              withSpinner(verbatimTextOutput("knnFit"), type = 5)),
+                                              withSpinner(verbatimTextOutput("knnFit"), type = 5),
+                                              withSpinner(verbatimTextOutput("rfFit"), type = 5)),
+                                     
                                      tabPanel("Prediction on Test Data", 
                                               p("There will be information here"))
                          )
