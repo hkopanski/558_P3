@@ -4,16 +4,16 @@ This application was developed using R version 4.1.0 and R Studio version 1.4.17
 
 To run this application you will need the following libraries:
 
-`library(shiny)             - version 1.6.0 \n
-library(tidyverse)         - version 1.3.1  \n
-library(shinythemes)       - version 1.2.0  \n
-library(forcats)           - version 0.5.1
-library(MASS)              - version 7.3-54
-library(caret)             - version 6.0-88
-library(DT)                - version 0.18
-library(matrixStats)       - version 0.59.0
-library(GGally)            - version 2.1.2
-library(shinycssloaders)   - version 1.0.0
+`library(shiny)             - version 1.6.0  
+library(tidyverse)         - version 1.3.1   
+library(shinythemes)       - version 1.2.0  
+library(forcats)           - version 0.5.1  
+library(MASS)              - version 7.3-54  
+library(caret)             - version 6.0-88  
+library(DT)                - version 0.18  
+library(matrixStats)       - version 0.59.0  
+library(GGally)            - version 2.1.2  
+library(shinycssloaders)   - version 1.0.0  
 library(AMR)               - version 1.7.1`
 
 To run this application directly from github, run the following in an R session:
