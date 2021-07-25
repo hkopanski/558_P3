@@ -20,8 +20,10 @@ library(AMR)               - version 1.7.1
 
 Running the following code will check for and install the required libraries if necessary:
 
-
-packages <- c(
+```
+packages <- c("shiny", "tidyverse", "shinythemes", "forcats", "MASS", 
+              "caret", "DT", "matrixStats", "GGally", "shinycssloaders", 
+              "AMR)
 
 libraries <- function(packages){
   for(i in packages){
@@ -31,7 +33,9 @@ libraries <- function(packages){
     }
   }
 }
+```
 
 To run this application directly from github, run the following in an R session:
-
-`shiny::runGitHub('hkopanski/558_P3', ref = 'main')`
+```
+shiny::runGitHub('hkopanski/558_P3', ref = 'main')
+```
