@@ -10,6 +10,7 @@
 library(shiny)
 library(tidyverse)
 library(shinythemes)
+library(randomForest)
 library(forcats)
 library(MASS)
 library(caret)
@@ -570,7 +571,18 @@ shinyServer(function(input, output, session) {
     
     plot_log_pred <- reactive({
       
-      df_log_pred() %>% ggplot(aes(Class, fill = misclass)) + geom_bar(position = "dodge")
+      if(length(df_log_pred()) >= 5){
+        
+        col_index <- names(df_log_pred())
+        
+        df_log_pred() %>% rename(x = col_index[1], y = col_index[2]) %>% 
+          ggplot(aes(x = x, y = y, col = as.factor(misclass))) + geom_point(shape = 20) + facet_grid( ~ Class)
+        
+      } else { 
+        
+        df_log_pred() %>% ggplot(aes(Class, fill = misclass)) + geom_bar(position = "dodge")
+        
+      }
       
     })
     
@@ -682,7 +694,18 @@ shinyServer(function(input, output, session) {
     
     plot_knn_pred <- reactive({
       
-      df_knn_pred() %>% ggplot(aes(Class, fill = misclass)) + geom_bar(position = "dodge")
+      if(length(df_knn_pred()) >= 5){
+        
+        col_index <- names(df_knn_pred())
+        
+        df_knn_pred() %>% rename(x = col_index[1], y = col_index[2]) %>% 
+          ggplot(aes(x = x, y = y, col = as.factor(misclass))) + geom_point(shape = 20) + facet_grid( ~ Class)
+        
+      } else { 
+        
+        df_knn_pred() %>% ggplot(aes(Class, fill = misclass)) + geom_bar(position = "dodge")
+        
+      }
       
     })
     
@@ -792,7 +815,32 @@ shinyServer(function(input, output, session) {
     
     plot_rf_pred <- reactive({
       
+      if(length(df_rf_pred()) >= 5){
+        
+        col_index <- names(df_rf_pred())
+        
+        df_rf_pred() %>% rename(x = col_index[1], y = col_index[2]) %>% 
+          ggplot(aes(x = x, y = y, col = as.factor(misclass))) + geom_point(shape = 20) + facet_grid( ~ Class)
+        
+      } else { 
+      
       df_rf_pred() %>% ggplot(aes(Class, fill = misclass)) + geom_bar(position = "dodge")
+      
+      }
+      
+    })
+    
+    rf_var_imp <- reactive({
+      
+      var_imp <- varImp(rf_fit, scale = TRUE)
+      var_imp <- as.data.frame(var_imp$importance)
+      var_imp <- var_imp[order(var_imp[[1]]), ]
+    
+    })
+    
+    rf_imp_plot <- reactive({
+      
+      dotchart(var_imp()[[1]], labels = row.names(var_imp()), col = dense_colors[5])
       
     })
     
@@ -864,6 +912,20 @@ shinyServer(function(input, output, session) {
       } else {
         
         plot_rf_pred()
+        
+      }
+      
+    })
+    
+    output$rfVarImpPlot <- renderPlot({
+      
+      if (is.null(rf_imp_plot())){
+        
+        return()
+        
+      } else {
+        
+        rf_imp_plot()
         
       }
       

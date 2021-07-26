@@ -10,6 +10,7 @@
 library(shiny)
 library(tidyverse)
 library(shinythemes)
+library(randomForest)
 library(forcats)
 library(MASS)
 library(caret)
@@ -116,11 +117,12 @@ shinyUI(fluidPage(
                                            "DMSNR Skew" = "DMSNR_skew"), 
                                      selected = "DMSNR Mean")),
                          downloadButton("downloadEDA", "Download data used in this Section"),
-                         br(),
+                         p(),
                          conditionalPanel(condition = "input.plot_type == 'A'",
                                           downloadButton("downloadPlot1", "Download plot (Scatter)")),
                          conditionalPanel(condition = "input.plot_type == 'B'",
-                                          downloadButton("downloadPlot2", "Download Density Plot (integration)"),
+                                          downloadButton("downloadPlot2", "Download Density Plot (Integrated)"),
+                                          p(),
                                           downloadButton("downloadPlot3", "Download plot (DM-SNR)")),
                          conditionalPanel(condition = "input.plot_type == 'C'",
                                           downloadButton("downloadPlot4", "Download Density Plot (Pairs)"),
@@ -301,6 +303,7 @@ shinyUI(fluidPage(
                                                                #verbatimTextOutput("rf_pred_rows"),
                                                                verbatimTextOutput("rfCT"),
                                                                dataTableOutput("dfRFPred"),
+                                                               plotOutput("rfVarImpPlot"),
                                                                plotOutput("plotRFPred")
                                                                )
                                               )
