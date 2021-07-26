@@ -1,4 +1,4 @@
-# 558_P3
+# Pulsar Classification Project
 
 This application was developed using R version 4.1.0 and R Studio version 1.4.1717.
 

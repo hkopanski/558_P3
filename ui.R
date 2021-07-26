@@ -261,7 +261,7 @@ shinyUI(fluidPage(
                                                                                               "KNN Analysis" = "knn",
                                                                                               "Ensemble Method" = "rf"),
                                             selected = c("glm")),
-                         
+                         actionButton("test_model", "Run Models on Test Set", class = "btn-success")
                          ),
                      mainPanel(
                          tabsetPanel(type = "tabs",
@@ -272,13 +272,28 @@ shinyUI(fluidPage(
                                               h3("This is the data that will be used for model training"),
                                               dataTableOutput("pulsar_redux"),
                                               verbatimTextOutput("train_rows"),
+                                              verbatimTextOutput("test_rows"),
                                               verbatimTextOutput("trnctrl"),
                                               withSpinner(verbatimTextOutput("logFit"), type = 5),
                                               withSpinner(verbatimTextOutput("knnFit"), type = 5),
                                               withSpinner(verbatimTextOutput("rfFit"), type = 5)),
                                      
                                      tabPanel("Prediction on Test Data", 
-                                              p("There will be information here"))
+                                              p("Model Test Results"),
+                                              conditionalPanel(condition = "input.model_sel == 'glm'",
+                                                               verbatimTextOutput("logMC"),
+                                                               #verbatimTextOutput("pred_rows"),
+                                                               verbatimTextOutput("logCT"),
+                                                               dataTableOutput("dfLogPred"),
+                                                               plotOutput("plotLogPred")
+                                                               ),
+                                              conditionalPanel(condition = "input.model_sel == 'knn'",
+                                                               p("information to go here")
+                                                               ),
+                                              conditionalPanel(condition = "input.model_sel == 'rf'",
+                                                               p("infomation to go here")
+                                                               )
+                                              )
                          )
                  )
              )

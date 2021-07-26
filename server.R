@@ -468,6 +468,20 @@ shinyServer(function(input, output, session) {
       
     })
     
+    output$test_rows <- renderPrint({
+      
+      if (is.null(testing())){
+        
+        return()
+        
+      } else {
+        
+        paste("The number of rows in the testing set is", length(testing()))
+        
+      }
+      
+    })
+    
     output$pulsar_redux <- renderDataTable({
       if (is.null(df_redux())){
         
@@ -518,6 +532,113 @@ shinyServer(function(input, output, session) {
       } else {
         
         rf_fit()
+        
+      }
+      
+    })
+    
+    log_pred <- eventReactive(input$test_model, {
+      
+      predict(log_fit(), newdata = df_test())
+      
+    })
+    
+    log_misclass <- reactive({
+      
+      paste("The log regression misclassification rate is" , round(sum(log_pred() != df_test()$Class) / nrow(df_test()), 3))
+        
+    })
+    
+    output$logMC <- renderPrint({
+      
+      if (is.null(log_misclass())){
+        
+        return("nothing yet")
+        
+      } else {
+        
+        log_misclass()
+        
+      }  
+      
+    })
+    
+    log_ctable <- reactive({
+      
+      confusionMatrix(log_pred(), df_test()$Class)
+    
+    })
+    
+    output$logCT <- renderPrint({
+      
+      if (is.null(log_ctable())){
+        
+        return("nothing yet")
+        
+      } else {
+        
+        log_ctable()
+        
+      }  
+      
+    })
+    
+    output$pred_rows <- renderPrint({
+      
+      if (is.null(log_pred())){
+        
+        return()
+        
+      } else {
+        
+        paste("The number of rows in the predicted set is", length(log_pred()))
+        
+      }
+      
+    })
+    
+    df_log_pred <- reactive({
+      
+      if (is.null(log_pred())){
+        
+        return()
+        
+      } else {
+        
+        df_test() %>% mutate(logPred = log_pred(), misclass = logPred != Class)
+        
+      }
+    })
+    
+    output$dfLogPred <- renderDataTable({
+      
+      if (is.null(df_log_pred())){
+        
+        return()
+        
+      } else {
+        
+        df_log_pred()
+        
+      }
+        
+      })
+    
+    plot_log_pred <- reactive({
+      
+      df_log_pred() %>% ggplot(aes(Class, fill = misclass)) + geom_bar(position = "dodge")
+      
+    })
+    
+    output$plotLogPred <- renderPlot({
+      
+      if (is.null(plot_log_pred())){
+        
+        return()
+        
+      } else {
+        
+        plot_log_pred()
         
       }
       
