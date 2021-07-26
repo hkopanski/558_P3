@@ -546,7 +546,32 @@ shinyServer(function(input, output, session) {
     log_misclass <- reactive({
       
       paste("The log regression misclassification rate is" , round(sum(log_pred() != df_test()$Class) / nrow(df_test()), 3))
+      
+    })
+    
+    log_ctable <- reactive({
+      
+      confusionMatrix(log_pred(), df_test()$Class)
+      
+    })
+    
+    df_log_pred <- reactive({
+      
+      if (is.null(log_pred())){
         
+        return()
+        
+      } else {
+        
+        df_test() %>% mutate(logPred = log_pred(), misclass = logPred != Class)
+        
+      }
+    })
+    
+    plot_log_pred <- reactive({
+      
+      df_log_pred() %>% ggplot(aes(Class, fill = misclass)) + geom_bar(position = "dodge")
+      
     })
     
     output$logMC <- renderPrint({
@@ -563,11 +588,6 @@ shinyServer(function(input, output, session) {
       
     })
     
-    log_ctable <- reactive({
-      
-      confusionMatrix(log_pred(), df_test()$Class)
-    
-    })
     
     output$logCT <- renderPrint({
       
@@ -597,18 +617,6 @@ shinyServer(function(input, output, session) {
       
     })
     
-    df_log_pred <- reactive({
-      
-      if (is.null(log_pred())){
-        
-        return()
-        
-      } else {
-        
-        df_test() %>% mutate(logPred = log_pred(), misclass = logPred != Class)
-        
-      }
-    })
     
     output$dfLogPred <- renderDataTable({
       
@@ -621,14 +629,9 @@ shinyServer(function(input, output, session) {
         df_log_pred()
         
       }
-        
-      })
-    
-    plot_log_pred <- reactive({
-      
-      df_log_pred() %>% ggplot(aes(Class, fill = misclass)) + geom_bar(position = "dodge")
       
     })
+    
     
     output$plotLogPred <- renderPlot({
       
@@ -639,6 +642,228 @@ shinyServer(function(input, output, session) {
       } else {
         
         plot_log_pred()
+        
+      }
+      
+    })
+    
+    knn_pred <- eventReactive(input$test_model, {
+      
+      set.seed(input$seed_set)
+      
+      predict(knn_fit(), newdata = df_test())
+      
+    })
+    
+    knn_misclass <- reactive({
+      
+      paste("The knn regression misclassification rate is" , round(sum(knn_pred() != df_test()$Class) / nrow(df_test()), 3))
+      
+    })
+    
+    knn_ctable <- reactive({
+      
+      confusionMatrix(knn_pred(), df_test()$Class)
+      
+    })
+    
+    df_knn_pred <- reactive({
+      
+      if (is.null(knn_pred())){
+        
+        return()
+        
+      } else {
+        
+        df_test() %>% mutate(knnPred = knn_pred(), misclass = knnPred != Class)
+        
+      }
+    })
+    
+    plot_knn_pred <- reactive({
+      
+      df_knn_pred() %>% ggplot(aes(Class, fill = misclass)) + geom_bar(position = "dodge")
+      
+    })
+    
+    output$knnMC <- renderPrint({
+      
+      if (is.null(knn_misclass())){
+        
+        return("nothing yet")
+        
+      } else {
+        
+        knn_misclass()
+        
+      }  
+      
+    })
+    
+    
+    output$knnCT <- renderPrint({
+      
+      if (is.null(knn_ctable())){
+        
+        return("nothing yet")
+        
+      } else {
+        
+        knn_ctable()
+        
+      }  
+      
+    })
+    
+    output$knn_pred_rows <- renderPrint({
+      
+      if (is.null(knn_pred())){
+        
+        return()
+        
+      } else {
+        
+        paste("The number of rows in the predicted set is", length(knn_pred()))
+        
+      }
+      
+    })
+    
+    
+    output$dfKNNPred <- renderDataTable({
+      
+      if (is.null(df_knn_pred())){
+        
+        return()
+        
+      } else {
+        
+        df_knn_pred()
+        
+      }
+      
+    })
+    
+    
+    output$plotKNNPred <- renderPlot({
+      
+      if (is.null(plot_knn_pred())){
+        
+        return()
+        
+      } else {
+        
+        plot_knn_pred()
+        
+      }
+      
+    })
+    
+    rf_pred <- eventReactive(input$test_model, {
+      
+      predict(rf_fit(), newdata = df_test())
+      
+    })
+    
+    rf_misclass <- reactive({
+      
+      paste("The rf regression misclassification rate is" , round(sum(rf_pred() != df_test()$Class) / nrow(df_test()), 3))
+      
+    })
+    
+    rf_ctable <- reactive({
+      
+      confusionMatrix(rf_pred(), df_test()$Class)
+      
+    })
+    
+    df_rf_pred <- reactive({
+      
+      if (is.null(rf_pred())){
+        
+        return()
+        
+      } else {
+        
+        df_test() %>% mutate(rfPred = rf_pred(), misclass = rfPred != Class)
+        
+      }
+    })
+    
+    plot_rf_pred <- reactive({
+      
+      df_rf_pred() %>% ggplot(aes(Class, fill = misclass)) + geom_bar(position = "dodge")
+      
+    })
+    
+    output$rfMC <- renderPrint({
+      
+      if (is.null(rf_misclass())){
+        
+        return("nothing yet")
+        
+      } else {
+        
+        rf_misclass()
+        
+      }  
+      
+    })
+    
+    
+    output$rfCT <- renderPrint({
+      
+      if (is.null(rf_ctable())){
+        
+        return("nothing yet")
+        
+      } else {
+        
+        rf_ctable()
+        
+      }  
+      
+    })
+    
+    output$rf_pred_rows <- renderPrint({
+      
+      if (is.null(rf_pred())){
+        
+        return()
+        
+      } else {
+        
+        paste("The number of rows in the predicted set is", length(rf_pred()))
+        
+      }
+      
+    })
+    
+    
+    output$dfRFPred <- renderDataTable({
+      
+      if (is.null(df_rf_pred())){
+        
+        return()
+        
+      } else {
+        
+        df_rf_pred()
+        
+      }
+      
+    })
+    
+    
+    output$plotRFPred <- renderPlot({
+      
+      if (is.null(plot_rf_pred())){
+        
+        return()
+        
+      } else {
+        
+        plot_rf_pred()
         
       }
       

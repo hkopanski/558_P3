@@ -273,14 +273,14 @@ shinyUI(fluidPage(
                                               dataTableOutput("pulsar_redux"),
                                               verbatimTextOutput("train_rows"),
                                               verbatimTextOutput("test_rows"),
-                                              verbatimTextOutput("trnctrl"),
-                                              withSpinner(verbatimTextOutput("logFit"), type = 5),
-                                              withSpinner(verbatimTextOutput("knnFit"), type = 5),
-                                              withSpinner(verbatimTextOutput("rfFit"), type = 5)),
+                                              verbatimTextOutput("trnctrl")
+                                              
+                                              ),
                                      
                                      tabPanel("Prediction on Test Data", 
                                               p("Model Test Results"),
                                               conditionalPanel(condition = "input.model_sel == 'glm'",
+                                                               withSpinner(verbatimTextOutput("logFit"), type = 5),
                                                                verbatimTextOutput("logMC"),
                                                                #verbatimTextOutput("pred_rows"),
                                                                verbatimTextOutput("logCT"),
@@ -288,10 +288,20 @@ shinyUI(fluidPage(
                                                                plotOutput("plotLogPred")
                                                                ),
                                               conditionalPanel(condition = "input.model_sel == 'knn'",
-                                                               p("information to go here")
+                                                               withSpinner(verbatimTextOutput("knnFit"), type = 5),
+                                                               verbatimTextOutput("knnMC"),
+                                                               #verbatimTextOutput("knn_pred_rows"),
+                                                               verbatimTextOutput("knnCT"),
+                                                               dataTableOutput("dfKNNPred"),
+                                                               plotOutput("plotKNNPred")
                                                                ),
                                               conditionalPanel(condition = "input.model_sel == 'rf'",
-                                                               p("infomation to go here")
+                                                               withSpinner(verbatimTextOutput("rfFit"), type = 5),
+                                                               verbatimTextOutput("rfMC"),
+                                                               #verbatimTextOutput("rf_pred_rows"),
+                                                               verbatimTextOutput("rfCT"),
+                                                               dataTableOutput("dfRFPred"),
+                                                               plotOutput("plotRFPred")
                                                                )
                                               )
                          )
