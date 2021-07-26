@@ -832,15 +832,17 @@ shinyServer(function(input, output, session) {
     
     rf_var_imp <- reactive({
       
-      var_imp <- varImp(rf_fit, scale = TRUE)
+      var_imp <- varImp(rf_fit(), scale = TRUE)
       var_imp <- as.data.frame(var_imp$importance)
       var_imp <- var_imp[order(var_imp[[1]]), ]
+      
+      var_imp
     
     })
     
     rf_imp_plot <- reactive({
       
-      dotchart(var_imp()[[1]], labels = row.names(var_imp()), col = dense_colors[5])
+      dotchart(rf_var_imp()[[1]] , labels = row.names(rf_var_imp()), col = dense_colors[5])
       
     })
     
