@@ -209,41 +209,59 @@ shinyUI(fluidPage(
         tabPanel("Modeling the Data",
                  sidebarLayout(
                      sidebarPanel(
-                         checkboxGroupInput("mod_var_opt", "Select Variables for Model Fitting:", 
-                                            names_list[1:8], selected = var[1:8]),
-                         numericInput("train_split", "Training Data Split", 
-                                      min = 0, max = 1, step = 0.05, value = 0.5),
-                         numericInput("seed_set", "Set Seed Value", 
-                                      min = 1, step = 1, value = 100),
-                         numericInput("pop_redux", "Data Reduction Multiplier \n 
-                                      (choosing 1 will use all available data)", 
-                                      min = 0, max = 1, step = 0.05, value = 0.1),
+                         h3("Test Train Split and Data set Reduction"),
+                         checkboxInput("hide_split", "Hide Train Test Options"),
+                         conditionalPanel(condition = "!input.hide_split",
+                                          
+                                          checkboxGroupInput("mod_var_opt", "Select Variables for Model Fitting:", 
+                                                             names_list[1:8], selected = var[1:8]),
+                                          numericInput("train_split", "Training Data Split", 
+                                                       min = 0, max = 1, step = 0.05, value = 0.5),
+                                          numericInput("seed_set", "Set Seed Value", 
+                                                       min = 1, step = 1, value = 100),
+                                                       numericInput("pop_redux", "Data Reduction Multiplier \n 
+                                                                    (choosing 1 will use all available data)", 
+                                                                    min = 0, max = 1, step = 0.05, value = 0.1)
+                                          ),
+                         
                          actionButton("model_prep", "Create Test and Train splits", class = "btn-success"),
+                        
                          br(),
-                         br(),
-                         selectInput("method_opt", "Cross-Validation Methods", list("Repeat CV" = "repeatedcv",
-                                                                                    "CV" = "cv",
-                                                                                    "LOOCV" = "LOOCV")),
-                         numericInput("k_fold", "K folds for Cross Validation", 
-                                      min = 1, max = 10, value = 5, step = 1),
-                         numericInput("cv_repeats", "Number of Repeats", 
-                                      min = 1, max = 5, value = 2, step = 1),
+                         h3("Cross Validation Arguments"),
+                         checkboxInput("hide_cv", "Hide CV Options"),
+                         conditionalPanel(condition = "!input.hide_cv",
+                                          
+                                          selectInput("method_opt", "Cross-Validation Methods", list("Repeat CV" = "repeatedcv",
+                                                                                                     "CV" = "cv",
+                                                                                                     "LOOCV" = "LOOCV")),
+                                          numericInput("k_fold", "K folds for Cross Validation", 
+                                                       min = 1, max = 10, value = 5, step = 1),
+                                          numericInput("cv_repeats", "Number of Repeats", 
+                                                       min = 1, max = 5, value = 2, step = 1)
+                                          ),
                          actionButton("tc_update", "Update Train Control Parameters", class = "btn-success"),
                          br(),
                          h3("Model Arguments"),
-                         numericInput("log_thresh", "Logistic Probability Threshhold", 
-                                      min = 0, max = 1, step = 0.05, value = 0.5),
-                         numericInput("max_k", "Maximum K value for KNN", 
-                                      min = 2, max = 25, value = 10, step = 1),
-                         numericInput("max_mtry", "Maximum Number of Variables for Random Forest", 
-                                      min = 1, max = 8, value = 8, step = 1),
-                         p("Using a maximum of 8 variables produces a bagging model"),
+                         checkboxInput("hide_mod_arg", "Hide Model Options"),
+                         conditionalPanel(condition = "!input.hide_mod_arg",
+                                          
+                                          numericInput("log_thresh", "Logistic Probability Threshhold", 
+                                                       min = 0, max = 1, step = 0.05, value = 0.5),
+                                          numericInput("max_k", "Maximum K value for KNN", 
+                                                       min = 2, max = 25, value = 10, step = 1),
+                                          numericInput("max_mtry", "Maximum Number of Variables for Random Forest", 
+                                                       min = 1, max = 8, value = 8, step = 1),
+                                          p("Using a maximum of 8 variables produces a bagging model")
+                                          
+                                          ),
+                         actionButton("run_model", "Create Models", class = "btn-success"),
                          br(),
-                         radioButtons("model_sel", "Select Models to be created", list("Logistic Regression" = "glm",
-                                                                                       "KNN Analysis" = "knn",
-                                                                                       "Ensemble Method" = "rf"),
+                         p(" "),
+                         radioButtons("model_sel", "Select Models to View Test Results", list("Logistic Regression" = "glm",
+                                                                                              "KNN Analysis" = "knn",
+                                                                                              "Ensemble Method" = "rf"),
                                             selected = c("glm")),
-                         actionButton("run_model", "Create Models", class = "btn-success")
+                         
                          ),
                      mainPanel(
                          tabsetPanel(type = "tabs",
