@@ -6,7 +6,7 @@
 #
 #    http://shiny.rstudio.com/
 #
-
+# Libraries used in this code
 library(shiny)
 library(tidyverse)
 library(shinythemes)
@@ -20,7 +20,7 @@ library(GGally)
 library(shinycssloaders)
 library(AMR)
 
-
+# Pull in the data set
 df_pulsar <- read_csv("./Data/HTRU_2.csv", col_names = FALSE)
 
 var <- c("integ_mean","integ_sd","integ_exkur","integ_skew",
@@ -35,6 +35,7 @@ df_pulsar$Class <- as.factor(df_pulsar$Class)
 
 df_pulsar2 <- df_pulsar %>% mutate_at(names(df_pulsar)[1:8], ~(scale(.) %>% as.vector))
 
+# Creating some information containers to be used in the app
 names_list <- list("integ_mean","integ_sd","integ_exkur","integ_skew",
                    "DMSNR_mean","DMSNR_sd","DMSNR_exkur","DMSNR_skew",
                    "Class")
@@ -106,7 +107,15 @@ shinyServer(function(input, output, session) {
       write.csv(df_data(), file, row.names = FALSE)
     }
   )
-
+  
+  observeEvent(input$var_sel1, {
+    var_list <- names_list[1:8]
+    
+    new_var_list <- var_list[var_list != input$var_sel1]
+    
+    updateSelectInput(session, "var_sel2", choices = new_var_list)
+  })
+  
   sc_ranges <- reactiveValues(x = NULL, y = NULL)
   
   observeEvent(input$scplot_dblclick, {
@@ -127,11 +136,11 @@ shinyServer(function(input, output, session) {
     
     df_data() %>% rename(x = var[var1], y = var[var2]) %>%
       ggplot() + geom_point(aes(x = x, y = y, col = Class), size = 0.5) + 
-      labs(x = proper_names1[var1], 
-           y = proper_names2[var2 - 4],
-           title = paste(proper_names2[var2 - 4],
+      labs(x = proper_names[var1], 
+           y = proper_names[var2],
+           title = paste(proper_names[var2],
                          "vs" ,
-                         proper_names1[var1])) +
+                         proper_names[var1])) +
       theme(legend.position = c(0.9, 0.9)) +
       scale_color_manual(values = c("Pulsar"     = dense_colors[1],
                                     "Non Pulsar" = dense_colors[7])) +
@@ -191,6 +200,7 @@ shinyServer(function(input, output, session) {
   })
 
   ###############################################################
+  # Creating downloader buttons and packaging the information to be downloaded
   output$downloadPlot1 <- downloadHandler(
     filename = function() {
       paste("plot-", Sys.Date(), ".png", sep="")
@@ -257,6 +267,13 @@ shinyServer(function(input, output, session) {
       summary_table
     }, rownames = TRUE)
     
+    observeEvent(input$km_sel1, {
+      var_list <- names_list[1:8]
+      
+      new_var_list <- var_list[var_list != input$km_sel1]
+      
+      updateSelectInput(session, "km_sel2", choices = new_var_list)
+    })
     
     k_ranges <- reactiveValues(x = NULL, y = NULL)
     
@@ -417,6 +434,10 @@ shinyServer(function(input, output, session) {
             trControl = train_ctrl())
     })
     
+    log_summary <- reactive({
+      summary(log_fit())
+    })
+    
     knn_fit <- eventReactive(input$run_model, {
       
       set.seed(input$seed_set)
@@ -429,6 +450,10 @@ shinyServer(function(input, output, session) {
             tuneGrid = data.frame(k = 2:input$max_k))
     })
     
+    knn_summary <- reactive({
+      knn_fit()$results
+    })
+    
     rf_fit <- eventReactive(input$run_model, {
       
       set.seed(input$seed_set)
@@ -439,6 +464,10 @@ shinyServer(function(input, output, session) {
             preProcess = c('center', 'scale'), 
             importance = TRUE,
             tuneGrid = data.frame(mtry = 1:input$max_mtry))
+    })
+    
+    rf_summary <- reactive({
+      rf_fit()$results
     })
     
     output$trnctrl <- renderPrint({
@@ -510,6 +539,20 @@ shinyServer(function(input, output, session) {
       
     })
     
+    output$logSummary <- renderPrint({
+      
+      if (is.null(log_summary())){
+        
+        return()
+        
+      } else {
+        
+        log_summary()
+        
+      }
+      
+    })
+    
     output$knnFit <- renderPrint({
       
       if (is.null(knn_fit())){
@@ -524,6 +567,20 @@ shinyServer(function(input, output, session) {
       
     })
     
+    output$knnSummary <- renderPrint({
+      
+      if (is.null(knn_summary())){
+        
+        return()
+        
+      } else {
+        
+        knn_summary()
+        
+      }
+      
+    })
+    
     output$rfFit <- renderPrint({
       
       if (is.null(rf_fit())){
@@ -533,6 +590,20 @@ shinyServer(function(input, output, session) {
       } else {
         
         rf_fit()
+        
+      }
+      
+    })
+    
+    output$rfSummary <- renderPrint({
+      
+      if (is.null(rf_summary())){
+        
+        return()
+        
+      } else {
+        
+        rf_summary()
         
       }
       
@@ -929,6 +1000,18 @@ shinyServer(function(input, output, session) {
         
         rf_imp_plot()
         
+      }
+      
+    })
+    
+    output$model_ready <- renderPrint({
+      
+      if (is.null(log_fit()) & is.null(knn_fit()) & is.null(rf_fit())){
+        return()
+      } else if (!is.null(log_fit()) & !is.null(knn_fit()) & !is.null(rf_fit())) {
+        print("Models are Ready! Check the next tab")
+      } else {
+        print("Training Models...........")
       }
       
     })

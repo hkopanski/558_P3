@@ -107,15 +107,16 @@ shinyUI(fluidPage(
                                      list("Integrated Mean" = "integ_mean", 
                                           "Integrated Standard Deviation" = "integ_sd", 
                                           "Integrated Kurtosis" = "integ_exkur", 
-                                          "Intergrated Skew" = "integ_skew"), 
-                                     selected = "Integrated Mean"),
+                                          "Intergrated Skew" = "integ_skew",
+                                          "DMSNR Mean" = "DMSNR_mean", 
+                                          "DMSNR Standard Deviation" = "DMSNR_sd", 
+                                          "DMSNR Kurtosis" = "DMSNR_exkur", 
+                                          "DMSNR Skew" = "DMSNR_skew"), 
+                                     selected = "integ_mean"),
                          
                          selectInput("var_sel2", "Second Variable to Plot (Y Axis)", 
-                                      list("DMSNR Mean" = "DMSNR_mean", 
-                                           "DMSNR Standard Deviation" = "DMSNR_sd", 
-                                           "DMSNR Kurtosis" = "DMSNR_exkur", 
-                                           "DMSNR Skew" = "DMSNR_skew"), 
-                                     selected = "DMSNR Mean")),
+                                     "", 
+                                     selected = "DMSNR_mean")),
                          downloadButton("downloadEDA", "Download data used in this Section"),
                          p(),
                          conditionalPanel(condition = "input.plot_type == 'A'",
@@ -159,14 +160,15 @@ shinyUI(fluidPage(
                                                                list("Integrated Mean" = "integ_mean", 
                                                                     "Integrated Standard Deviation" = "integ_sd", 
                                                                     "Integrated Kurtosis" = "integ_exkur", 
-                                                                    "Intergrated Skew" = "integ_skew"), 
-                                                               selected = "Integrated Mean"),
-                                                   
-                                                   selectInput("km_sel2", "Second Variable to Plot (Y Axis)", 
-                                                               list("DMSNR Mean" = "DMSNR_mean", 
+                                                                    "Intergrated Skew" = "integ_skew",
+                                                                    "DMSNR Mean" = "DMSNR_mean", 
                                                                     "DMSNR Standard Deviation" = "DMSNR_sd", 
                                                                     "DMSNR Kurtosis" = "DMSNR_exkur", 
                                                                     "DMSNR Skew" = "DMSNR_skew"), 
+                                                               selected = "Integrated Mean"),
+                                                   
+                                                   selectInput("km_sel2", "Second Variable to Plot (Y Axis)", 
+                                                               "", 
                                                                selected = "DMSNR Mean")),
                                   conditionalPanel(condition = "input.dd_type == 'B'",
                                                    radioButtons("pca_plot_type", "Select a PCA Plot",
@@ -212,6 +214,10 @@ shinyUI(fluidPage(
                  sidebarLayout(
                      sidebarPanel(
                          h3("Test Train Split and Data set Reduction"),
+                         p("Due to the large size of the data set, you are able to reduce the data 
+                           set size by adjusting the data reduction multipier. For example, 
+                           entering 0.25 will result in a randomly sample dataset that is 25% the 
+                           size of the original. This is so wait times can be reduced for analysis"),
                          checkboxInput("hide_split", "Hide Train Test Options"),
                          conditionalPanel(condition = "!input.hide_split",
                                           
@@ -227,9 +233,10 @@ shinyUI(fluidPage(
                                           ),
                          
                          actionButton("model_prep", "Create Test and Train splits", class = "btn-success"),
-                        
+                         p("Once this button has been pressed, verify the information displayed on the model fitting tab."),
                          br(),
                          h3("Cross Validation Arguments"),
+                         p("Enter and verify the following information."),
                          checkboxInput("hide_cv", "Hide CV Options"),
                          conditionalPanel(condition = "!input.hide_cv",
                                           
@@ -257,9 +264,10 @@ shinyUI(fluidPage(
                                           
                                           ),
                          actionButton("run_model", "Create Models", class = "btn-success"),
+                         p("A message will appear once models have been trained and are ready for testing."),
                          br(),
                          p(" "),
-                         radioButtons("model_sel", "Select Models to View Test Results", list("Logistic Regression" = "glm",
+                         radioButtons("model_sel", "Select Models to View in Prediction Tab", list("Logistic Regression" = "glm",
                                                                                               "KNN Analysis" = "knn",
                                                                                               "Ensemble Method" = "rf"),
                                             selected = c("glm")),
@@ -275,7 +283,8 @@ shinyUI(fluidPage(
                                               dataTableOutput("pulsar_redux"),
                                               verbatimTextOutput("train_rows"),
                                               verbatimTextOutput("test_rows"),
-                                              verbatimTextOutput("trnctrl")
+                                              verbatimTextOutput("trnctrl"),
+                                              withSpinner(verbatimTextOutput("model_ready"), type = 5)
                                               
                                               ),
                                      
@@ -283,27 +292,27 @@ shinyUI(fluidPage(
                                               p("Model Test Results"),
                                               conditionalPanel(condition = "input.model_sel == 'glm'",
                                                                withSpinner(verbatimTextOutput("logFit"), type = 5),
+                                                               withSpinner(verbatimTextOutput("logSummary"), type = 5),
                                                                verbatimTextOutput("logMC"),
-                                                               #verbatimTextOutput("pred_rows"),
                                                                verbatimTextOutput("logCT"),
                                                                dataTableOutput("dfLogPred"),
                                                                plotOutput("plotLogPred")
                                                                ),
                                               conditionalPanel(condition = "input.model_sel == 'knn'",
                                                                withSpinner(verbatimTextOutput("knnFit"), type = 5),
+                                                               withSpinner(verbatimTextOutput("knnSummary"), type = 5),
                                                                verbatimTextOutput("knnMC"),
-                                                               #verbatimTextOutput("knn_pred_rows"),
                                                                verbatimTextOutput("knnCT"),
                                                                dataTableOutput("dfKNNPred"),
                                                                plotOutput("plotKNNPred")
                                                                ),
                                               conditionalPanel(condition = "input.model_sel == 'rf'",
                                                                withSpinner(verbatimTextOutput("rfFit"), type = 5),
+                                                               withSpinner(verbatimTextOutput("rfSummary"), type = 5),
+                                                               plotOutput("rfVarImpPlot"),
                                                                verbatimTextOutput("rfMC"),
-                                                               #verbatimTextOutput("rf_pred_rows"),
                                                                verbatimTextOutput("rfCT"),
                                                                dataTableOutput("dfRFPred"),
-                                                               plotOutput("rfVarImpPlot"),
                                                                plotOutput("plotRFPred")
                                                                )
                                               )
