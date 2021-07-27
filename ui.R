@@ -186,10 +186,11 @@ shinyUI(fluidPage(
                                                                     "PC5" = 5,
                                                                     "PC6" = 6,
                                                                     "PC7" = 7,
-                                                                    "PC8" = 8), selected = "PC1"),
+                                                                    "PC8" = 8)
+                                                               ),
                                                    br(),
                                                    selectInput("PCA_pick2", "Choose a 2nd Principal Component",
-                                                               "", selected = "PC2"),
+                                                               ""),
                                   ),
                                   ),
                      mainPanel(

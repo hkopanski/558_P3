@@ -162,7 +162,8 @@ shinyServer(function(input, output, session) {
       labs(x = "", y = "Density") +
       scale_fill_manual(guide = guide_legend(), name =  "Integrated \nReadings",  
                         labels = c("Mean", "Standard Deviation","Kurtosis", "Skew"),
-                        values = dense_colors[1:4])
+                        values = dense_colors[1:4]) +
+      facet_grid( ~ Class)
     })
   
   output$denPlot1 <- renderPlot({
@@ -182,7 +183,8 @@ shinyServer(function(input, output, session) {
       labs(x = "", y = "Density") +
       scale_fill_manual(guide = guide_legend(), name =  "DM-SNR \nReadings",  
                         labels = c("Mean", "Standard Deviation","Kurtosis", "Skew"), 
-                        values = dense_colors[5:8])
+                        values = dense_colors[5:8]) +
+      facet_grid( ~ Class)
   })
   
   output$denPlot2 <- renderPlot({
@@ -478,7 +480,8 @@ shinyServer(function(input, output, session) {
         
         } else {
           
-      paste("Method:", train_ctrl()$method, "|","Number of K folds:", train_ctrl()$number, "|","Number of Repeats",train_ctrl()$repeats)
+      paste("Method:", train_ctrl()$method, "|","Number of K folds:", 
+            train_ctrl()$number, "|","Number of Repeats",train_ctrl()$repeats)
       
         }
           
