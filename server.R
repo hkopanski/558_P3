@@ -68,6 +68,9 @@ PCA_tab <- data.frame(PCA_pulsar$rotation,
 
 colnames(df_pca_plot) <- c("PCA", "variance")
 
+sum_stats_total <- df_pulsar %>%  
+  summarise(across(starts_with(c("integ", "DMSNR")), list(max = max, min = min)))
+
 ##################################################################################
 
 shinyServer(function(input, output, session) {
@@ -76,7 +79,8 @@ shinyServer(function(input, output, session) {
     return(list(src = "./Data/crab_pulsar.png",
                 contentType = "image/png",
                 width = 300,
-                height = 300)
+                height = 300, 
+                alt = "Image of the Crab Nebula Pulsar")
            )
   }, deleteFile = FALSE)
   
@@ -650,7 +654,8 @@ shinyServer(function(input, output, session) {
         col_index <- names(df_log_pred())
         
         df_log_pred() %>% rename(x = col_index[1], y = col_index[2]) %>% 
-          ggplot(aes(x = x, y = y, col = as.factor(misclass))) + geom_point(shape = 20) + facet_grid( ~ Class)
+          ggplot(aes(x = x, y = y, col = as.factor(misclass))) + geom_point(shape = 20) + facet_grid( ~ Class) +
+          scale_color_discrete(name = "Misclassification") + labs(x = col_index[1], y = col_index[2])
         
       } else { 
         
@@ -773,8 +778,9 @@ shinyServer(function(input, output, session) {
         col_index <- names(df_knn_pred())
         
         df_knn_pred() %>% rename(x = col_index[1], y = col_index[2]) %>% 
-          ggplot(aes(x = x, y = y, col = as.factor(misclass))) + geom_point(shape = 20) + facet_grid( ~ Class)
-        
+          ggplot(aes(x = x, y = y, col = as.factor(misclass))) + geom_point(shape = 20) + facet_grid( ~ Class) +
+          scale_color_discrete(name = "Misclassification") + labs(x = col_index[1], y = col_index[2])
+         
       } else { 
         
         df_knn_pred() %>% ggplot(aes(Class, fill = misclass)) + geom_bar(position = "dodge")
@@ -894,7 +900,8 @@ shinyServer(function(input, output, session) {
         col_index <- names(df_rf_pred())
         
         df_rf_pred() %>% rename(x = col_index[1], y = col_index[2]) %>% 
-          ggplot(aes(x = x, y = y, col = as.factor(misclass))) + geom_point(shape = 20) + facet_grid( ~ Class)
+          ggplot(aes(x = x, y = y, col = as.factor(misclass))) + geom_point(shape = 20) + facet_grid( ~ Class) +
+          scale_color_discrete(name = "Misclassification") + labs(x = col_index[1], y = col_index[2])
         
       } else { 
       
@@ -916,7 +923,8 @@ shinyServer(function(input, output, session) {
     
     rf_imp_plot <- reactive({
       
-      dotchart(rf_var_imp()[[1]] , labels = row.names(rf_var_imp()), col = dense_colors[5])
+      dotchart(rf_var_imp()[[1]] , labels = row.names(rf_var_imp()), col = dense_colors[5], 
+               main = "Variable Importance Plot", xlab = "Relative Importance")
       
     })
     

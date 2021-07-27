@@ -57,13 +57,61 @@ shinyUI(fluidPage(
     tabsetPanel(
         tabPanel("About",
                 mainPanel(
-                    h3("Pulsars and how they are measured"),
+                    h3("Pulsar Classification"),
                     br(),
-                    p("Pulsars are a type of fast spinnig and highly active form of a neutron star."),
-                    imageOutput("pulsar_image"),
-                    p("Source of image: https://www.esa.int/ESA_Multimedia/Images/2003/05/NGC_1952_Crab_Nebula_pulsar_imaged_by_the_NASA_ESA_Hubble_Space_Telescope"),
-                    br(),
-                    p("Thier spin can be measured and recorded. The purpose of this app is to be able to classify pulsars from non pulsar neutron stars.")
+                    p("Pulsars are subset of neutron stars with the distinguishing feature of 
+                      being highly magnetized and fast spinning. This characteristic causes 
+                      them to appear as pulsating radio wave sources when observed (some do 
+                      give off x-ray and even visible light pulses", 
+                      tags$a(href = "https://astronomy.swin.edu.au/cosmos/p/pulsar", "SWIN Link"), 
+                      "). The pulse is a result of the pulsar’s radio beam sweeping past the earth 
+                      for every rotation. Due to the very regular and precise nature of the 
+                      pulses they give off, pulsars have become extremely important astronomical 
+                      objects. They are used by physicists to conduct experiments on the 
+                      most extreme areas of relativity and for making observations on the 
+                      structure of our universe",tags$a(href = "https://www.nrao.edu/pr/2012/aaaspulsars/", "NRAO Link"),".  
+                      More can be read about pulsars and how they are being studied can be found 
+                      in the links found in this write up and here 
+                      ", tags$a(href = "https://chandra.si.edu/xray_sources/neutron_stars.html", "Chandra Link"),"."),
+                    h3("Rendering of Pulsar"),
+                    img(src = "magnetar.png", height = '250px', width = '500px', contentType = "image/png"),
+                    h3(),
+                    p("Source of image:", 
+                    tags$a(href = "https://www.nasa.gov/sites/default/files/thumbnails/image/magnetar20200617-16.jpg", "NASA Link"),""),
+                    h3(),
+                    h3("Source Data"),
+                    p("Data for about 18,000 neutron stars, some of which being pulsars, was 
+                      obtained from the High Time Resolution Universe Survey and can be found 
+                      here", tags$a(href = "https://archive.ics.uci.edu/ml/datasets/HTRU2", "UCI Link"),"."),
+                    p("Each observation contains 9 variables (8 predictors and 1 classification). 
+                      The 8 predictors are comprised of 4 statistical attributes (mean, standard 
+                      deviation, excess kurtosis, and skew)  for the integrated radio profile 
+                      and dispersion measure signal to noise ratio (DM-SNR). As a pulsar’s 
+                      radio signal travels through space it interacts with interstellar media. 
+                      This interaction creates a frequency based time delay, higher frequencies 
+                      being delayed less than lower frequencies. The radio frequency can be 
+                      integrated into a single profile of which is one of the predictors described 
+                      in this app. To allow for the integration of the radio profile, the 
+                      dispersion of each frequency has to be measured (essentially a factor 
+                      that is applied to account for the time delay). The dispersion measure 
+                      can be analyzed to produce more statistics on the neutron star in question. 
+                      The information provided by both the integrated profile and the dispersion 
+                      measure provides a sort of a finger print for the neutron star. A more in 
+                      depth explanation of this can be found here", tags$a(href = "https://arxiv.org/abs/1603.05166", 
+                                                                           "research paper"),"."),
+                    h3("Application Purpose"),
+                    p("The purpose of this app is to provide an interactive data analysis of neutron 
+                      star data. The app allows you to view the raw data and get an understanding of 
+                      the range of each of the predictors (see the “Data” tab). There is also the 
+                      ability to graph the data in various scatter and density plots. Also, allowing 
+                      you to view how the predictors relate to each other (see “Exploratory Data 
+                      Analysis” tab). For a deeper dive into the data, the app has the ability to 
+                      run a clustering and principal component analysis on the data (see “Deep Dive” tab). 
+                      Finally, the user will be able to create 3 different prediction models and 
+                      test them to see how well a pulsar can be identified using the provided data 
+                      (see “Modeling the Data” tab). Instruction on how to use each tools are provided in the respective tabs."),
+                    img(src = "pulsar.gif", height = '250px', width = '500px'),
+                    p("Source of image/gif:", tags$a(href = "https://www.nasa.gov/sites/default/files/thumbnails/image/pulsar_magnetosphere_model_web.gif", "NASA Link"), " ")
                  )
         ),
         tabPanel("Data",
@@ -272,6 +320,7 @@ shinyUI(fluidPage(
                                                                                               "KNN Analysis" = "knn",
                                                                                               "Ensemble Method" = "rf"),
                                             selected = c("glm")),
+                         p("Once the models have been trained they are ready for testing"),
                          actionButton("test_model", "Run Models on Test Set", class = "btn-success")
                          ),
                      mainPanel(
@@ -280,7 +329,6 @@ shinyUI(fluidPage(
                                               p("There will be information here")),
                                      tabPanel("Model Fitting", 
                                               
-                                              h3("This is the data that will be used for model training"),
                                               dataTableOutput("pulsar_redux"),
                                               verbatimTextOutput("train_rows"),
                                               verbatimTextOutput("test_rows"),
@@ -290,7 +338,7 @@ shinyUI(fluidPage(
                                               ),
                                      
                                      tabPanel("Prediction on Test Data", 
-                                              p("Model Test Results"),
+                                              p("Model Results"),
                                               conditionalPanel(condition = "input.model_sel == 'glm'",
                                                                withSpinner(verbatimTextOutput("logFit"), type = 5),
                                                                withSpinner(verbatimTextOutput("logSummary"), type = 5),
