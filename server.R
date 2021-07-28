@@ -47,7 +47,7 @@ proper_names <-  c("Integrated Mean", "Integrated Standard Deviation",
 names(names_list) <- c(proper_names , "Class")
 
 proper_names1 <- c("Integrated Mean", "Integrated Standard Deviation", 
-                  "Integrated Kurtosis", "Intergrated Skew")
+                  "Integrated Kurtosis", "Integrated Skew")
 
 proper_names2 <- c("DMSNR Mean", "DMSNR Standard Deviation", "DMSNR Kurtosis",
                    "DMSNR Skew")
@@ -68,8 +68,29 @@ PCA_tab <- data.frame(PCA_pulsar$rotation,
 
 colnames(df_pca_plot) <- c("PCA", "variance")
 
-sum_stats_total <- df_pulsar %>%  
-  summarise(across(starts_with(c("integ", "DMSNR")), list(max = max, min = min)))
+
+#Making a stats table for the 8 predictors
+sum_stats_total <- df_pulsar %>%  summarise(across(starts_with(c("integ", "DMSNR")), list(mean = mean, max = max, min = min)))
+sum_stats_total <- t(sum_stats_total)
+
+sum_stats_total  <- as_tibble(sum_stats_total, rownames = "attribute")
+
+names(sum_stats_total)[2] <- "Values"
+
+sum_stats_total$type <- rep(c("mean", "max", "min"),8)
+
+var_name <- rep("NA", 24)
+
+x <- sum_stats_total$attribute
+
+for(i in 1:24){
+  var_name[i] <- paste0(unlist(strsplit(x, "_")[i])[1], "_", unlist(strsplit(x, "_")[i])[2])
+}
+
+sum_stats_total$predictor <- var_name
+sum_stats_total
+
+sum_stats_total %>% select(Values, type, predictor) %>% pivot_wider(names_from = type, values_from = Values)
 
 ##################################################################################
 
@@ -444,7 +465,7 @@ shinyServer(function(input, output, session) {
             method = "knn", 
             trControl = train_ctrl(), 
             preProcess = c("center", "scale"), 
-            tuneGrid = data.frame(k = 2:input$max_k))
+            tuneGrid = expand.grid(k = 2:input$max_k))
     })
     
     knn_summary <- reactive({
@@ -460,7 +481,8 @@ shinyServer(function(input, output, session) {
             method = 'rf',
             preProcess = c('center', 'scale'), 
             importance = TRUE,
-            tuneGrid = data.frame(mtry = 1:input$max_mtry))
+            tuneGrid = expand.grid(mtry = 1:input$max_mtry), 
+            ntree = input$n_trees)
     })
     
     rf_summary <- reactive({

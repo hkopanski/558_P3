@@ -155,7 +155,7 @@ shinyUI(fluidPage(
                                      list("Integrated Mean" = "integ_mean", 
                                           "Integrated Standard Deviation" = "integ_sd", 
                                           "Integrated Kurtosis" = "integ_exkur", 
-                                          "Intergrated Skew" = "integ_skew",
+                                          "Integrated Skew" = "integ_skew",
                                           "DMSNR Mean" = "DMSNR_mean", 
                                           "DMSNR Standard Deviation" = "DMSNR_sd", 
                                           "DMSNR Kurtosis" = "DMSNR_exkur", 
@@ -172,7 +172,7 @@ shinyUI(fluidPage(
                          conditionalPanel(condition = "input.plot_type == 'B'",
                                           downloadButton("download_plot2", "Download Density Plot (Integrated)"),
                                           p(),
-                                          downloadButton("download_plot3", "Download plot (DM-SNR)")),
+                                          downloadButton("download_plot3", "Download Density plot (DM-SNR)")),
                          conditionalPanel(condition = "input.plot_type == 'C'",
                                           downloadButton("download_plot4", "Download Density Plot (Pairs)"),
                                           p("Click once and please wait, pairs plot download takes a moment to prepare"))
@@ -208,7 +208,7 @@ shinyUI(fluidPage(
                                                                list("Integrated Mean" = "integ_mean", 
                                                                     "Integrated Standard Deviation" = "integ_sd", 
                                                                     "Integrated Kurtosis" = "integ_exkur", 
-                                                                    "Intergrated Skew" = "integ_skew",
+                                                                    "Integrated Skew" = "integ_skew",
                                                                     "DMSNR Mean" = "DMSNR_mean", 
                                                                     "DMSNR Standard Deviation" = "DMSNR_sd", 
                                                                     "DMSNR Kurtosis" = "DMSNR_exkur", 
@@ -303,13 +303,13 @@ shinyUI(fluidPage(
                          checkboxInput("hide_mod_arg", "Hide Model Options"),
                          conditionalPanel(condition = "!input.hide_mod_arg",
                                           
-                                          numericInput("log_thresh", "Logistic Probability Threshhold", 
-                                                       min = 0, max = 1, step = 0.05, value = 0.5),
                                           numericInput("max_k", "Maximum K value for KNN", 
                                                        min = 2, max = 25, value = 10, step = 1),
                                           numericInput("max_mtry", "Maximum Number of Variables for Random Forest", 
-                                                       min = 1, max = 8, value = 8, step = 1),
-                                          p("Using a maximum of 8 variables produces a bagging model")
+                                                       min = 1, max = 8, value = 3, step = 1),
+                                          numericInput("n_trees", "Number of trees for Random Forest",
+                                                       min = 100, max = 5000, value = 1000),
+                                          p("Using a maximum of 8 variables may produce a bagging model")
                                           
                                           ),
                          actionButton("run_model", "Create Models", class = "btn-success"),
