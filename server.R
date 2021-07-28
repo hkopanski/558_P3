@@ -41,7 +41,7 @@ names_list <- list("integ_mean","integ_sd","integ_exkur","integ_skew",
                    "Class")
 
 proper_names <-  c("Integrated Mean", "Integrated Standard Deviation", 
-                   "Integrated Kurtosis", "Intergrated Skew", "DMSNR Mean", 
+                   "Integrated Kurtosis", "Integrated Skew", "DMSNR Mean", 
                    "DMSNR Standard Deviation", "DMSNR Kurtosis", "DMSNR Skew")
 
 names(names_list) <- c(proper_names , "Class")
@@ -74,15 +74,6 @@ sum_stats_total <- df_pulsar %>%
 ##################################################################################
 
 shinyServer(function(input, output, session) {
-  
-  output$pulsar_image <- renderImage({ 
-    return(list(src = "./Data/crab_pulsar.png",
-                contentType = "image/png",
-                width = 300,
-                height = 300, 
-                alt = "Image of the Crab Nebula Pulsar")
-           )
-  }, deleteFile = FALSE)
   
   df_data <- reactive({
                   switch(input$df_type,
@@ -170,7 +161,7 @@ shinyServer(function(input, output, session) {
       facet_grid( ~ Class)
     })
   
-  output$denPlot1 <- renderPlot({
+  output$den_plot1_ui <- renderPlot({
     
     density_integ()
     
@@ -191,7 +182,7 @@ shinyServer(function(input, output, session) {
       facet_grid( ~ Class)
   })
   
-  output$denPlot2 <- renderPlot({
+  output$den_plot2_ui <- renderPlot({
     
     density_DMSNR()
     
@@ -199,7 +190,7 @@ shinyServer(function(input, output, session) {
   
   pairs_plot <- reactive({ ggpairs(df_data(), mapping = ggplot2::aes(color = Class)) })
   
-  output$pairsPlot <- renderPlot({
+  output$pairs_plot_ui <- renderPlot({
     
     pairs_plot()
     
@@ -207,7 +198,7 @@ shinyServer(function(input, output, session) {
 
   ###############################################################
   # Creating downloader buttons and packaging the information to be downloaded
-  output$downloadPlot1 <- downloadHandler(
+  output$download_plot1 <- downloadHandler(
     filename = function() {
       paste("plot-", Sys.Date(), ".png", sep="")
     },
@@ -217,7 +208,7 @@ shinyServer(function(input, output, session) {
     contentType = "image/png"
   )
   
-  output$downloadPlot2 <- downloadHandler(
+  output$download_plot2 <- downloadHandler(
     filename = function() {
       paste("plot-", Sys.Date(), ".png", sep="")
     },
@@ -227,7 +218,7 @@ shinyServer(function(input, output, session) {
     contentType = "image/png"
   )
   
-  output$downloadPlot3 <- downloadHandler(
+  output$download_plot3 <- downloadHandler(
     filename = function() {
       paste("plot-", Sys.Date(), ".png", sep="")
     },
@@ -237,7 +228,7 @@ shinyServer(function(input, output, session) {
     contentType = "image/png"
   )
   
-  output$downloadPlot4 <- downloadHandler(
+  output$download_plot4 <- downloadHandler(
     filename = function() {
       paste("plot-", Sys.Date(), ".png", sep="")
     },
@@ -532,7 +523,7 @@ shinyServer(function(input, output, session) {
       
     }, options = list(pageLength = 5, autoWidth = TRUE))
     
-    output$logFit <- renderPrint({
+    output$log_fit_ui <- renderPrint({
       
       if (is.null(log_fit())){
         
@@ -546,7 +537,7 @@ shinyServer(function(input, output, session) {
       
     })
     
-    output$logSummary <- renderPrint({
+    output$log_summary_ui <- renderPrint({
       
       if (is.null(log_summary())){
         
@@ -560,7 +551,7 @@ shinyServer(function(input, output, session) {
       
     })
     
-    output$knnFit <- renderPrint({
+    output$knn_fit_ui <- renderPrint({
       
       if (is.null(knn_fit())){
         
@@ -574,7 +565,7 @@ shinyServer(function(input, output, session) {
       
     })
     
-    output$knnSummary <- renderPrint({
+    output$knn_summary_ui <- renderPrint({
       
       if (is.null(knn_summary())){
         
@@ -588,7 +579,7 @@ shinyServer(function(input, output, session) {
       
     })
     
-    output$rfFit <- renderPrint({
+    output$rf_fit_ui <- renderPrint({
       
       if (is.null(rf_fit())){
         
@@ -602,7 +593,7 @@ shinyServer(function(input, output, session) {
       
     })
     
-    output$rfSummary <- renderPrint({
+    output$rf_summary_ui <- renderPrint({
       
       if (is.null(rf_summary())){
         
@@ -665,7 +656,7 @@ shinyServer(function(input, output, session) {
       
     })
     
-    output$logMC <- renderPrint({
+    output$log_MC_ui <- renderPrint({
       
       if (is.null(log_misclass())){
         
@@ -680,7 +671,7 @@ shinyServer(function(input, output, session) {
     })
     
     
-    output$logCT <- renderPrint({
+    output$log_CT_ui <- renderPrint({
       
       if (is.null(log_ctable())){
         
@@ -709,7 +700,7 @@ shinyServer(function(input, output, session) {
     })
     
     
-    output$dfLogPred <- renderDataTable({
+    output$df_log_pred_ui <- renderDataTable({
       
       if (is.null(df_log_pred())){
         
@@ -723,8 +714,8 @@ shinyServer(function(input, output, session) {
       
     })
     
-    
-    output$plotLogPred <- renderPlot({
+
+    output$plot_log_pred_ui <- renderPlot({
       
       if (is.null(plot_log_pred())){
         
@@ -789,7 +780,7 @@ shinyServer(function(input, output, session) {
       
     })
     
-    output$knnMC <- renderPrint({
+    output$knn_MC_ui <- renderPrint({
       
       if (is.null(knn_misclass())){
         
@@ -804,7 +795,7 @@ shinyServer(function(input, output, session) {
     })
     
     
-    output$knnCT <- renderPrint({
+    output$knn_CT_ui <- renderPrint({
       
       if (is.null(knn_ctable())){
         
@@ -833,7 +824,7 @@ shinyServer(function(input, output, session) {
     })
     
     
-    output$dfKNNPred <- renderDataTable({
+    output$df_KNN_pred_ui <- renderDataTable({
       
       if (is.null(df_knn_pred())){
         
@@ -848,7 +839,7 @@ shinyServer(function(input, output, session) {
     })
     
     
-    output$plotKNNPred <- renderPlot({
+    output$plot_KNN_pred_ui <- renderPlot({
       
       if (is.null(plot_knn_pred())){
         
@@ -928,7 +919,7 @@ shinyServer(function(input, output, session) {
       
     })
     
-    output$rfMC <- renderPrint({
+    output$rf_MC_ui <- renderPrint({
       
       if (is.null(rf_misclass())){
         
@@ -943,7 +934,7 @@ shinyServer(function(input, output, session) {
     })
     
     
-    output$rfCT <- renderPrint({
+    output$rf_CT_ui <- renderPrint({
       
       if (is.null(rf_ctable())){
         
@@ -972,7 +963,7 @@ shinyServer(function(input, output, session) {
     })
     
     
-    output$dfRFPred <- renderDataTable({
+    output$df_RF_pred_ui <- renderDataTable({
       
       if (is.null(df_rf_pred())){
         
@@ -987,7 +978,7 @@ shinyServer(function(input, output, session) {
     })
     
     
-    output$plotRFPred <- renderPlot({
+    output$plot_RF_pred_ui <- renderPlot({
       
       if (is.null(plot_rf_pred())){
         
@@ -1001,7 +992,7 @@ shinyServer(function(input, output, session) {
       
     })
     
-    output$rfVarImpPlot <- renderPlot({
+    output$rf_var_imp_plot <- renderPlot({
       
       if (is.null(rf_imp_plot())){
         

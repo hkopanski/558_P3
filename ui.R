@@ -168,13 +168,13 @@ shinyUI(fluidPage(
                          downloadButton("downloadEDA", "Download data used in this Section"),
                          p(),
                          conditionalPanel(condition = "input.plot_type == 'A'",
-                                          downloadButton("downloadPlot1", "Download plot (Scatter)")),
+                                          downloadButton("download_plot1", "Download plot (Scatter)")),
                          conditionalPanel(condition = "input.plot_type == 'B'",
-                                          downloadButton("downloadPlot2", "Download Density Plot (Integrated)"),
+                                          downloadButton("download_plot2", "Download Density Plot (Integrated)"),
                                           p(),
-                                          downloadButton("downloadPlot3", "Download plot (DM-SNR)")),
+                                          downloadButton("download_plot3", "Download plot (DM-SNR)")),
                          conditionalPanel(condition = "input.plot_type == 'C'",
-                                          downloadButton("downloadPlot4", "Download Density Plot (Pairs)"),
+                                          downloadButton("download_plot4", "Download Density Plot (Pairs)"),
                                           p("Click once and please wait, pairs plot download takes a moment to prepare"))
                      ),
                      
@@ -186,12 +186,12 @@ shinyUI(fluidPage(
                                         type = 5)),
                          conditionalPanel(condition = "input.plot_type == 'B'",
                             h4("Density Plot for the 4 Integrated Measurements"),
-                            withSpinner(plotOutput("denPlot1"), type = 5),
+                            withSpinner(plotOutput("den_plot1_ui"), type = 5),
                             h4("Density Plot for the 4 DM-SNR Measurements"),
-                            withSpinner(plotOutput("denPlot2"), type = 5)),
+                            withSpinner(plotOutput("den_plot2_ui"), type = 5)),
                          conditionalPanel(condition = "input.plot_type == 'C'",
                             h4("Pairs Plot for Pulsar Data"),
-                            withSpinner(plotOutput("pairsPlot"),type = 5)),                  
+                            withSpinner(plotOutput("pairs_plot_ui"),type = 5)),                  
                          withSpinner(tableOutput("information"), type = 5)
                      )
                  )
@@ -340,29 +340,29 @@ shinyUI(fluidPage(
                                      tabPanel("Prediction on Test Data", 
                                               p("Model Results"),
                                               conditionalPanel(condition = "input.model_sel == 'glm'",
-                                                               withSpinner(verbatimTextOutput("logFit"), type = 5),
-                                                               withSpinner(verbatimTextOutput("logSummary"), type = 5),
-                                                               verbatimTextOutput("logMC"),
-                                                               verbatimTextOutput("logCT"),
-                                                               dataTableOutput("dfLogPred"),
-                                                               plotOutput("plotLogPred")
+                                                               withSpinner(verbatimTextOutput("log_fit_ui"), type = 5),
+                                                               withSpinner(verbatimTextOutput("log_summary_ui"), type = 5),
+                                                               verbatimTextOutput("log_MC_ui"),
+                                                               verbatimTextOutput("log_CT_ui"),
+                                                               dataTableOutput("df_log_pred_ui"),
+                                                               plotOutput("plot_log_pred_ui")
                                                                ),
                                               conditionalPanel(condition = "input.model_sel == 'knn'",
-                                                               withSpinner(verbatimTextOutput("knnFit"), type = 5),
-                                                               withSpinner(verbatimTextOutput("knnSummary"), type = 5),
-                                                               verbatimTextOutput("knnMC"),
-                                                               verbatimTextOutput("knnCT"),
-                                                               dataTableOutput("dfKNNPred"),
-                                                               plotOutput("plotKNNPred")
+                                                               withSpinner(verbatimTextOutput("knn_fit_ui"), type = 5),
+                                                               withSpinner(verbatimTextOutput("knn_summary_ui"), type = 5),
+                                                               verbatimTextOutput("knn_MC_ui"),
+                                                               verbatimTextOutput("knn_CT_ui"),
+                                                               dataTableOutput("df_KNN_pred_ui"),
+                                                               plotOutput("plot_KNN_pred_ui")
                                                                ),
                                               conditionalPanel(condition = "input.model_sel == 'rf'",
-                                                               withSpinner(verbatimTextOutput("rfFit"), type = 5),
-                                                               withSpinner(verbatimTextOutput("rfSummary"), type = 5),
-                                                               plotOutput("rfVarImpPlot"),
-                                                               verbatimTextOutput("rfMC"),
-                                                               verbatimTextOutput("rfCT"),
-                                                               dataTableOutput("dfRFPred"),
-                                                               plotOutput("plotRFPred")
+                                                               withSpinner(verbatimTextOutput("rf_fit_ui"), type = 5),
+                                                               withSpinner(verbatimTextOutput("rf_summary_ui"), type = 5),
+                                                               plotOutput("rf_var_imp_plot"),
+                                                               verbatimTextOutput("rf_MC_ui"),
+                                                               verbatimTextOutput("rf_CT_ui"),
+                                                               dataTableOutput("df_RF_pred_ui"),
+                                                               plotOutput("plot_RF_pred_ui")
                                                                )
                                               )
                          )
