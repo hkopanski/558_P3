@@ -338,12 +338,13 @@ shinyUI(fluidPage(
                      mainPanel(
                          tabsetPanel(type = "tabs",
                                      tabPanel("Model Information",
+                                              withMathJax(),
                                               h3("Methods used in this Application"),
                                               p("This application allows for 3 types of classification methods: Logistic, KNN, 
                                                 and Random Forests. Below is a short summary of those three methods. All information 
                                                 presented here was pulled from 'An Introduction to Statistical Learning' by James et al.",
                                                 tags$a(href = "https://www.statlearning.com/", "This link"),"will take you to the book's 
-                                                web page. There you will be able to find a more in depth explantion of the methods in this 
+                                                web page. There you will be able to find a more in depth explanation of the methods in this 
                                                 application as well as some additional ones."),
                                               h3("Logistic Regression"),
                                               p("Logistic regression is a generalized form of linear regression. The main difference being 
@@ -351,7 +352,36 @@ shinyUI(fluidPage(
                                                 observation falls in a certain classification. In this case, the logistic regression is determining
                                                 whether the probability of a particular neutron star is a pulsar or not. The default setting is 50%,
                                                 but this can be adjusted manually if explicitly indicated."),
-                                              p("There will be information here")),
+                                              p("The general form of the logisitic regression equation are as follows:"),
+                                              p(strong("Form 1")),
+                                              helpText("$$ln\\left(\\frac{p(x)}{1 - p(x)}\\right) = \\beta_0 + \\beta_1x_1 + \\beta_2x_2 + .......$$"),
+                                              p(strong("Form 2")),
+                                              helpText("$$\\frac{p(x)}{1 - p(x)} = e^{\\beta_0 + \\beta_1x_1 + \\beta_2x_2 + .......}$$"),
+                                              p(strong("Form 3")),
+                                              helpText("$$p(x) = \\frac{e^{\\beta_0 + \\beta_1x_1 + \\beta_2x_2 + .......}}{1 - e^{\\beta_0 + \\beta_1x_1 + \\beta_2x_2 + .......}}$$"),
+                                              
+                                              p("All three forms are derived from the same equation, but to focus on form 1, we can easily see how
+                                                logisitic and linear regression are related. Hence the name, generalized linear equation. The left side 
+                                                of the equation is what is known as the log odds, or logit, function. This is what essentially 'converts' 
+                                                a continuous term to a probability. In this case, without the logit function, we could have run a linear
+                                                regression model an created a cutoff point for the response. This would lead to odd results such as anything
+                                                over 100,000 is a pulsar. That value would not carry any real meaning and would be difficult to explain. 
+                                                Where as, denoted the response as a probability is a bit more intuitive."),
+                                              h3("k Nearest Neighbors"),
+                                              p("KNN is a  relatively easy concept to understand. Basically, classification is done by observing the k number 
+                                                of neighbors near a point of interest and classifying that point as the majority of the neighbor classification.
+                                                For example, an observation would be considered a pulsar if over 50% of it's neighbors are pulsars. This 
+                                                'distance' is the euclidean distance and is calculated as such. The formula is as follows:"),
+                                              p(strong("Euclidean Distance")),
+                                              helpText("$$d^2 = d_{x_1}^2 + d_{x_2}^2 + d_{x_3}^2 + .......$$"), 
+                                              helpText(span("In the case of pulsar data, each \\(d_x\\) is a predictor mentioned in the application such as 
+                                                            Integrated Mean.", style = "color:gray")),
+                                              p("The disadvantage of KNN is that it suffers from the curse of dimensionality. Meaning the more terms that are
+                                                added the more data you would need. Adding more predictors to the model without more data causes the model to 
+                                                become less accurate. Also, KNN can be computationaly intense, especially when there are a lot of data points."),
+                                              h3("Ensemble Methods (Random Forests)"),
+                                              p("It is difficult to explain when a random forest is without first explaining decision trees and bagging.")
+                                              ),
                                      tabPanel("Model Fitting", 
                                               
                                               dataTableOutput("pulsar_redux"),
