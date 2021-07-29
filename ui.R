@@ -138,7 +138,13 @@ shinyUI(fluidPage(
                                       "Select the Plot Type",
                                       list("Scatter" = "A",
                                            "Density" = "B",
-                                           "Pairs" = "C")),
+                                           "Pairs" = "C",
+                                           "Boxplots" = "D")),
+                         br(),
+                         radioButtons("split_on_class",
+                                      "Split chart on Class",
+                                      list("Yes" = "yes",
+                                           "No" = "no")),
                          br(),
                          h4("Select below to use standardized data"),
                          br(),
@@ -174,8 +180,11 @@ shinyUI(fluidPage(
                                           p(),
                                           downloadButton("download_plot3", "Download Density plot (DM-SNR)")),
                          conditionalPanel(condition = "input.plot_type == 'C'",
-                                          downloadButton("download_plot4", "Download Density Plot (Pairs)"),
-                                          p("Click once and please wait, pairs plot download takes a moment to prepare"))
+                                          downloadButton("download_plot4", "Download Pairs Plot"),
+                                          p("Click once and please wait, pairs plot download takes a moment to prepare")),
+                         conditionalPanel(condition = "input.plot_type == 'D'",
+                                          downloadButton("download_plot5", "Download Boxplot"),
+                                          p())
                      ),
                      
                      mainPanel(
@@ -191,7 +200,10 @@ shinyUI(fluidPage(
                             withSpinner(plotOutput("den_plot2_ui"), type = 5)),
                          conditionalPanel(condition = "input.plot_type == 'C'",
                             h4("Pairs Plot for Pulsar Data"),
-                            withSpinner(plotOutput("pairs_plot_ui"),type = 5)),                  
+                            withSpinner(plotOutput("pairs_plot_ui"),type = 5)),
+                         conditionalPanel(condition = "input.plot_type == 'D'",
+                            h4("Boxplot for Pulsar Data"),
+                            withSpinner(plotOutput("boxplot_ui"),type = 5)),
                          withSpinner(tableOutput("information"), type = 5)
                      )
                  )
@@ -325,7 +337,20 @@ shinyUI(fluidPage(
                          ),
                      mainPanel(
                          tabsetPanel(type = "tabs",
-                                     tabPanel("Model Information", 
+                                     tabPanel("Model Information",
+                                              h3("Methods used in this Application"),
+                                              p("This application allows for 3 types of classification methods: Logistic, KNN, 
+                                                and Random Forests. Below is a short summary of those three methods. All information 
+                                                presented here was pulled from 'An Introduction to Statistical Learning' by James et al.",
+                                                tags$a(href = "https://www.statlearning.com/", "This link"),"will take you to the book's 
+                                                web page. There you will be able to find a more in depth explantion of the methods in this 
+                                                application as well as some additional ones."),
+                                              h3("Logistic Regression"),
+                                              p("Logistic regression is a generalized form of linear regression. The main difference being 
+                                                rather than finding a regression value, the model will output a probability of whether an
+                                                observation falls in a certain classification. In this case, the logistic regression is determining
+                                                whether the probability of a particular neutron star is a pulsar or not. The default setting is 50%,
+                                                but this can be adjusted manually if explicitly indicated."),
                                               p("There will be information here")),
                                      tabPanel("Model Fitting", 
                                               

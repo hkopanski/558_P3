@@ -73,24 +73,30 @@ colnames(df_pca_plot) <- c("PCA", "variance")
 sum_stats_total <- df_pulsar %>%  summarise(across(starts_with(c("integ", "DMSNR")), list(mean = mean, max = max, min = min)))
 sum_stats_total <- t(sum_stats_total)
 
-sum_stats_total  <- as_tibble(sum_stats_total, rownames = "attribute")
+sum_stats_pulsar <- df_pulsar %>% filter(Class == "Pulsar") %>% summarise(across(starts_with(c("integ", "DMSNR")), list(mean = mean, max = max, min = min)))
+sum_stats_pulsar <- t(sum_stats_pulsar)
 
-names(sum_stats_total)[2] <- "Values"
+sum_stats_non_puls <- df_pulsar %>% filter(Class == "Non Pulsar") %>% summarise(across(starts_with(c("integ", "DMSNR")), list(mean = mean, max = max, min = min)))
+sum_stats_non_puls <- t(sum_stats_non_puls)
 
-sum_stats_total$type <- rep(c("mean", "max", "min"),8)
+sum_stats_total  <- as_tibble(sum_stats_total, rownames = "attribute", .name_repair = "unique")
+sum_stats_pulsar  <- as_tibble(sum_stats_pulsar, rownames = "attribute", .name_repair = "unique")
+sum_stats_non_puls  <- as_tibble(sum_stats_non_puls, rownames = "attribute", .name_repair = "unique")
 
-var_name <- rep("NA", 24)
+sum_stats_total <- sum_stats_total %>% rename(Values = ...1) %>% 
+  separate(attribute, into = c("name1", "name2" , "type"), sep = "_") %>% 
+  mutate(predictor = paste0(name1, "_", name2)) %>% dplyr::select(type, Values, predictor) %>% 
+  pivot_wider(names_from = type, values_from = Values)
 
-x <- sum_stats_total$attribute
+sum_stats_pulsar <- sum_stats_pulsar %>% rename(Values = ...1) %>% 
+  separate(attribute, into = c("name1", "name2" , "type"), sep = "_") %>% 
+  mutate(predictor = paste0(name1, "_", name2)) %>% dplyr::select(type, Values, predictor) %>% 
+  pivot_wider(names_from = type, values_from = Values)
 
-for(i in 1:24){
-  var_name[i] <- paste0(unlist(strsplit(x, "_")[i])[1], "_", unlist(strsplit(x, "_")[i])[2])
-}
-
-sum_stats_total$predictor <- var_name
-sum_stats_total
-
-sum_stats_total %>% select(Values, type, predictor) %>% pivot_wider(names_from = type, values_from = Values)
+sum_stats_non_puls <- sum_stats_non_puls %>% rename(Values = ...1) %>% 
+  separate(attribute, into = c("name1", "name2" , "type"), sep = "_") %>% 
+  mutate(predictor = paste0(name1, "_", name2)) %>% dplyr::select(type, Values, predictor) %>% 
+  pivot_wider(names_from = type, values_from = Values)
 
 ##################################################################################
 
@@ -167,7 +173,8 @@ shinyServer(function(input, output, session) {
     scatter_plot()
     })
   
-  density_integ <- reactive({ 
+  density_integ <- reactive({
+    g <- 
     ggplot(df_data()) +
       geom_density(aes(x = integ_mean, fill = dense_colors[1]), alpha = .2) +
       geom_density(aes(x = integ_sd, fill = dense_colors[2]), alpha = .2) +
@@ -178,8 +185,12 @@ shinyServer(function(input, output, session) {
       labs(x = "", y = "Density") +
       scale_fill_manual(guide = guide_legend(), name =  "Integrated \nReadings",  
                         labels = c("Mean", "Standard Deviation","Kurtosis", "Skew"),
-                        values = dense_colors[1:4]) +
-      facet_grid( ~ Class)
+                        values = dense_colors[1:4])
+      if(input$split_on_class == "yes"){
+        return(g + facet_grid( ~ Class))
+        } else {
+          return(g)
+          }
     })
   
   output$den_plot1_ui <- renderPlot({
@@ -189,6 +200,7 @@ shinyServer(function(input, output, session) {
   })
   
   density_DMSNR <- reactive({
+    g <-
     ggplot(df_data()) +
       geom_density(aes(x = DMSNR_mean, fill = dense_colors[5]), alpha = .2) +
       geom_density(aes(x = DMSNR_sd, fill = dense_colors[6]), alpha = .2) +
@@ -199,8 +211,13 @@ shinyServer(function(input, output, session) {
       labs(x = "", y = "Density") +
       scale_fill_manual(guide = guide_legend(), name =  "DM-SNR \nReadings",  
                         labels = c("Mean", "Standard Deviation","Kurtosis", "Skew"), 
-                        values = dense_colors[5:8]) +
-      facet_grid( ~ Class)
+                        values = dense_colors[5:8]) 
+    
+    if(input$split_on_class == "yes"){
+      return(g + facet_grid( ~ Class))
+      } else {
+        return(g)
+        }
   })
   
   output$den_plot2_ui <- renderPlot({
@@ -209,19 +226,39 @@ shinyServer(function(input, output, session) {
     
   })
   
-  pairs_plot <- reactive({ ggpairs(df_data(), mapping = ggplot2::aes(color = Class)) })
+  pairs_plot <- ggpairs(df_pulsar, mapping = ggplot2::aes(color = Class))
   
   output$pairs_plot_ui <- renderPlot({
     
-    pairs_plot()
+    pairs_plot
     
+  })
+  
+  boxplot_pulsar <- reactive({
+    g <- 
+      df_data() %>% pivot_longer(cols = starts_with(c("integ", "DMSNR")), names_to = "predictor", values_to = "Value") %>% 
+      mutate(predictor = factor(predictor, levels = c("integ_mean","integ_sd","integ_exkur","integ_skew","DMSNR_mean","DMSNR_sd","DMSNR_exkur","DMSNR_skew"))) %>%
+      ggplot(aes(x = predictor, y = Value)) + geom_boxplot(aes(fill = predictor), alpha = 0.7) + 
+      labs(x = "", y = "Values") +
+      scale_fill_manual(values = dense_colors,
+                        name = "Predictors") 
+    
+    if(input$split_on_class == "yes"){
+      return(g + facet_grid( ~ Class))
+    } else {
+      return(g)
+    }
+  })
+  
+  output$boxplot_ui <- renderPlot({
+    boxplot_pulsar()
   })
 
   ###############################################################
   # Creating downloader buttons and packaging the information to be downloaded
   output$download_plot1 <- downloadHandler(
     filename = function() {
-      paste("plot-", Sys.Date(), ".png", sep="")
+      paste("scatter_plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       ggsave(file, plot = scatter_plot(), device = "png")
@@ -231,7 +268,7 @@ shinyServer(function(input, output, session) {
   
   output$download_plot2 <- downloadHandler(
     filename = function() {
-      paste("plot-", Sys.Date(), ".png", sep="")
+      paste("den_integ_plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       ggsave(file, plot = density_integ(), device = "png")
@@ -241,7 +278,7 @@ shinyServer(function(input, output, session) {
   
   output$download_plot3 <- downloadHandler(
     filename = function() {
-      paste("plot-", Sys.Date(), ".png", sep="")
+      paste("den_DM_plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       ggsave(file, plot = density_DMSNR(), device = "png")
@@ -251,10 +288,20 @@ shinyServer(function(input, output, session) {
   
   output$download_plot4 <- downloadHandler(
     filename = function() {
-      paste("plot-", Sys.Date(), ".png", sep="")
+      paste("pair_plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
-      ggsave(file, plot = pairs_plot(), device = "png")
+      ggsave(file, plot = pairs_plot, device = "png")
+    },
+    contentType = "image/png"
+  )
+  
+  output$download_plot5 <- downloadHandler(
+    filename = function() {
+      paste("boxplot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      ggsave(file, plot = boxplot_pulsar(), device = "png")
     },
     contentType = "image/png"
   )
