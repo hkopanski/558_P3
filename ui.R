@@ -71,6 +71,10 @@ shinyUI(fluidPage(
                       More can be read about pulsars and how they are being studied can be found 
                       in the links found in this write up and here 
                       ", tags$a(href = "https://chandra.si.edu/xray_sources/neutron_stars.html", "Chandra Link"),"."),
+                    img(src = "pulsar.gif", height = '250px', width = '500px'),
+                    p("Source of image/gif:", tags$a(href = "https://www.nasa.gov/sites/default/files/thumbnails/image/pulsar_magnetosphere_model_web.gif", "NASA Link"), " "),
+                    p("The above gif displays why we see the 'pulse'. As the pulsar rotates, magnetic field (seen in blue) sweeps across the Earth. Each time this happens, 
+                      a blip in radio signal is picked up."),
                     h3("Rendering of Pulsar"),
                     img(src = "magnetar.png", height = '250px', width = '500px', contentType = "image/png"),
                     h3(),
@@ -107,9 +111,8 @@ shinyUI(fluidPage(
                       run a clustering and principal component analysis on the data (see “Deep Dive” tab). 
                       Finally, the user will be able to create 3 different prediction models and 
                       test them to see how well a pulsar can be identified using the provided data 
-                      (see “Modeling the Data” tab). Instruction on how to use each tools are provided in the respective tabs."),
-                    img(src = "pulsar.gif", height = '250px', width = '500px'),
-                    p("Source of image/gif:", tags$a(href = "https://www.nasa.gov/sites/default/files/thumbnails/image/pulsar_magnetosphere_model_web.gif", "NASA Link"), " ")
+                      (see “Modeling the Data” tab). Instruction on how to use each tools are provided in the respective tabs.")
+                    
                  )
         ),
         tabPanel("Data",
