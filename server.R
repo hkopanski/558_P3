@@ -59,7 +59,7 @@ kplot_colors <- c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3",
 PCA_pulsar <- df_pulsar %>% dplyr::select("integ_mean":"DMSNR_skew") %>% 
   prcomp(., scale = TRUE)
 
-df_pca_plot <- as_tibble(cbind(1:8, PCA_pulsar$sdev^2))
+df_pca_plot <- as_tibble(cbind(1:8, PCA_pulsar$sdev^2), .name_repair = "unique")
 
 PCA_tab <- data.frame(PCA_pulsar$rotation, 
                       row.names = proper_names)
@@ -360,7 +360,7 @@ shinyServer(function(input, output, session) {
       
       km_pulsar <- kmeans(df_pulsar[ , 1:8], input$k_clust, nstart = 20, iter.max = 50)
       
-      df_kplot <- as_tibble(cbind(df_pulsar[ , plot_var], km_pulsar$cluster))
+      df_kplot <- as_tibble(cbind(df_pulsar[ , plot_var], km_pulsar$cluster), .name_repair = "unique")
       
       names(df_kplot)[4] <- "cluster"
       
