@@ -68,13 +68,13 @@ colnames(df_pca_plot) <- c("PCA", "variance")
 
 
 #Making a stats table for the 8 predictors
-sum_stats_total <- df_pulsar %>%  summarise(across(starts_with(c("integ", "DMSNR")), list(mean = mean, max = max, min = min)))
+sum_stats_total <- df_pulsar %>%  summarise(across(starts_with(c("integ", "DMSNR")), list(mean = mean, min = min, max = max)))
 sum_stats_total <- t(sum_stats_total)
 
-sum_stats_pulsar <- df_pulsar %>% filter(Class == "Pulsar") %>% summarise(across(starts_with(c("integ", "DMSNR")), list(mean = mean, max = max, min = min)))
+sum_stats_pulsar <- df_pulsar %>% filter(Class == "Pulsar") %>% summarise(across(starts_with(c("integ", "DMSNR")), list(mean = mean, min = min, max = max)))
 sum_stats_pulsar <- t(sum_stats_pulsar)
 
-sum_stats_non_puls <- df_pulsar %>% filter(Class == "Non Pulsar") %>% summarise(across(starts_with(c("integ", "DMSNR")), list(mean = mean, max = max, min = min)))
+sum_stats_non_puls <- df_pulsar %>% filter(Class == "Non Pulsar") %>% summarise(across(starts_with(c("integ", "DMSNR")), list(mean = mean, min = min, max = max)))
 sum_stats_non_puls <- t(sum_stats_non_puls)
 
 sum_stats_total  <- as_tibble(sum_stats_total, rownames = "attribute", .name_repair = "unique")
@@ -1083,6 +1083,103 @@ shinyServer(function(input, output, session) {
         print("Training Models...........")
       }
       
+    })
+    
+    output$sum_stats_total_ui <- renderTable({
+      sum_stats_total
+    })
+    
+    output$sum_stats_pulsar_ui <- renderTable({
+      sum_stats_pulsar[ , 2:4]
+    })
+    
+    output$sum_stats_non_puls_ui <- renderTable({
+      sum_stats_non_puls[ , 2:4]
+    })
+    
+    observe({
+      
+      num_entries <- c("i_mean", "i_sd", "i_exkur", "i_skew", 
+                       "dmsnr_mean", "dmsnr_sd", "dmsnr_exkur", "dmsnr_skew")
+      
+      for(i in 1:8){
+        updateNumericInput(session, num_entries[i], min = as.numeric(sum_stats_total[i,3]), 
+                           max = as.numeric(sum_stats_total[i, 4]), 
+                           value = as.numeric(sum_stats_total[i, 2])
+        )
+      }
+    })
+    
+    single_pred_log <- eventReactive(input$single_test, {
+      
+      predict(log_fit(), newdata = as_tibble(list("integ_mean" = input$i_mean,
+                                               "integ_sd" = input$i_sd,
+                                               "integ_exkur" = input$i_exkur,
+                                               "integ_skew" = input$i_skew,
+                                               "DMSNR_mean" = input$dmsnr_mean,
+                                               "DMSNR_sd" = input$dmsnr_sd,
+                                               "DMSNR_exkur" = input$dmsnr_exkur,
+                                               "DMSNR_skew" = input$dmsnr_skew
+                                               )
+                                          )
+      )
+    })
+    
+    single_pred_knn <- eventReactive(input$single_test, {
+      
+      predict(knn_fit(), newdata = as_tibble(list("integ_mean" = input$i_mean,
+                                                  "integ_sd" = input$i_sd,
+                                                  "integ_exkur" = input$i_exkur,
+                                                  "integ_skew" = input$i_skew,
+                                                  "DMSNR_mean" = input$dmsnr_mean,
+                                                  "DMSNR_sd" = input$dmsnr_sd,
+                                                  "DMSNR_exkur" = input$dmsnr_exkur,
+                                                  "DMSNR_skew" = input$dmsnr_skew
+      )
+      )
+      )
+    })
+    
+    single_pred_rf <- eventReactive(input$single_test, {
+      
+      predict(rf_fit(), newdata = as_tibble(list("integ_mean" = input$i_mean,
+                                                  "integ_sd" = input$i_sd,
+                                                  "integ_exkur" = input$i_exkur,
+                                                  "integ_skew" = input$i_skew,
+                                                  "DMSNR_mean" = input$dmsnr_mean,
+                                                  "DMSNR_sd" = input$dmsnr_sd,
+                                                  "DMSNR_exkur" = input$dmsnr_exkur,
+                                                  "DMSNR_skew" = input$dmsnr_skew
+      )
+      )
+      )
+    })
+    
+    output$single_pred_log_ui <- renderPrint({
+      
+      if(is.null(single_pred_log())){
+        return()
+      } else {
+      paste("Logistic regression predicts this to be", single_pred_log())
+      }
+    })
+    
+    output$single_pred_knn_ui <- renderPrint({
+      
+      if(is.null(single_pred_log())){
+        return()
+      } else {
+        paste("KNN predicts this to be", single_pred_knn())
+      }
+    })
+    
+    output$single_pred_rf_ui <- renderPrint({
+      
+      if(is.null(single_pred_log())){
+        return()
+      } else {
+        paste("Random Forest predicts this to be", single_pred_rf())
+      }
     })
 
 })

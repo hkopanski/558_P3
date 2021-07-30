@@ -365,6 +365,7 @@ shinyUI(fluidPage(
                                                 regression model an created a cutoff point for the response. This would lead to odd results such as anything
                                                 over 100,000 is a pulsar. That value would not carry any real meaning and would be difficult to explain. 
                                                 Where as, denoted the response as a probability is a bit more intuitive."),
+                                              p("A disadvantage of logictic regression is the data is assumed to be linear, so "),
                                               h3("k Nearest Neighbors"),
                                               p("KNN is a  relatively easy concept to understand. Basically, classification is done by observing the k number 
                                                 of neighbors near a point of interest and classifying that point as the majority of the neighbor classification.
@@ -378,7 +379,23 @@ shinyUI(fluidPage(
                                                 added the more data you would need. Adding more predictors to the model without more data causes the model to 
                                                 become less accurate. Also, KNN can be computationaly intense, especially when there are a lot of data points."),
                                               h3("Ensemble Methods (Random Forests)"),
-                                              p("It is difficult to explain when a random forest is without first explaining decision trees and bagging.")
+                                              p("It is difficult to explain what a random forest is without first explaining decision trees and bagging. To 
+                                                start of, decisions trees are flow chart type of way of classification. Meaning, when training a decision tree model
+                                                you are looking for values in the data where the sample splits an creates the lowest amount of variance in the case
+                                                of regression, and the lowest misclassification in the case of classification. This is done until a satisfactory 
+                                                point such as no single group is more than 10. The problem with trees are that they are prone to high variance, where
+                                                a small change in the data will create completely different tree. This is where bootstrap aggregation, or bagging, 
+                                                comes in. Here, instead of using the entire training set, a sample with replacement is used instead (the set is treated
+                                                as a population). Since the sampling is done with replacement, roughly two thirds of the data is used in the model training.
+                                                The other third is used to test the model. This is done a large number of time, 500 or so. In each instance, an observation
+                                                is given a classification (or a value in the case of regression). Once the model training is complete, each observation is
+                                                given a classification based on majority vote (for example in 300 of the 500 trees, an observation was classified as a 
+                                                pulsar). In the case of regression, the observation is assigned the averege value of all the trees. This method reduces 
+                                                model variance since the observation value/classification is based on an average rather than a single tree basded model.
+                                                Random forest takes this concept one step further, and varies the number of predictors. This allows for less dominant 
+                                                predictors to contribute to the final model and provide an overall more accurate prediction. The disadvantage is they 
+                                                do not have a single closed form formula, so they are essentially a black box algorithm."),
+                                              p("Please, go to the 'Model Fitting' tab to begin training and testing models.")
                                               ),
                                      tabPanel("Model Fitting", 
                                               
@@ -391,7 +408,7 @@ shinyUI(fluidPage(
                                               ),
                                      
                                      tabPanel("Prediction on Test Data", 
-                                              p("Model Results"),
+                                              h3("Model Results"),
                                               conditionalPanel(condition = "input.model_sel == 'glm'",
                                                                withSpinner(verbatimTextOutput("log_fit_ui"), type = 5),
                                                                withSpinner(verbatimTextOutput("log_summary_ui"), type = 5),
@@ -417,6 +434,58 @@ shinyUI(fluidPage(
                                                                dataTableOutput("df_RF_pred_ui"),
                                                                plotOutput("plot_RF_pred_ui")
                                                                )
+                                              ),
+                                     tabPanel("Data Entry Prediction",
+                                              h3("Enter a set of values to see what each model will predict"),
+                                              fluidRow(
+                                                  column(width = 4,
+                                                         numericInput("i_mean", "Integrated Mean",
+                                                                      min = -100, max = 200, value = 100),
+                                                         numericInput("i_sd", "Integrated Standard Deviation",
+                                                                      min = -100, max = 200, value = 100),
+                                                         numericInput("i_exkur", "Integrated Excess Kurtosis",
+                                                                      min = -100, max = 200, value = 100),
+                                                         numericInput("i_skew", "Integrated Skew",
+                                                                      min = -100, max = 200, value = 100),
+                                                         
+                                                  ),
+                                                  column(width = 4,
+                                                         numericInput("dmsnr_mean", "DMSNR Mean",
+                                                                      min = -100, max = 200, value = 100),
+                                                         numericInput("dmsnr_sd", "DMSNR Standard Deviation",
+                                                                      min = -100, max = 200, value = 100),
+                                                         numericInput("dmsnr_exkur", "DMSNR Excess Kurtosis",
+                                                                      min = -100, max = 200, value = 100),
+                                                         numericInput("dmsnr_skew", "DMSNR Skew",
+                                                                      min = -100, max = 200, value = 100),
+                                                  )
+                                              ),
+                                              
+                                              fluidRow(
+                                                  actionButton("single_test", "Click here to get prediction",  
+                                                               class = "btn-success"),
+                                                  verbatimTextOutput("single_pred_log_ui"),
+                                                  verbatimTextOutput("single_pred_knn_ui"),
+                                                  verbatimTextOutput("single_pred_rf_ui")
+                                                  
+                                              ),
+                                             
+                                              fluidRow(
+                                                  h3("Reference Data"),
+                                                  column(4,
+                                                         p(strong("Total Data")),
+                                                         tableOutput("sum_stats_total_ui")
+                                                  ),
+                                                  column(2,
+                                                         p(strong("Pulsar Data")),
+                                                         tableOutput("sum_stats_pulsar_ui")
+                                                  ),
+                                                  column(2,
+                                                         p(strong("Non Pulsar Data")),
+                                                         tableOutput("sum_stats_non_puls_ui")
+                                                  )
+                                                  
+                                              )
                                               )
                          )
                  )
