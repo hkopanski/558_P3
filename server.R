@@ -455,7 +455,7 @@ shinyServer(function(input, output, session) {
     })
     
     #Model Fitting Section
-    
+    #Reduce the size of data otherwise analysis will take a long time.
     df_redux <- eventReactive(input$model_prep, {
       set.seed(input$seed_set)
       df_pulsar[sample(1:nrow(df_pulsar), size = nrow(df_pulsar) * input$pop_redux),
@@ -486,6 +486,7 @@ shinyServer(function(input, output, session) {
                    repeats = input$cv_repeats)
     })
     
+    ###################Fitting the Models###################
     log_fit <- eventReactive(input$run_model, {
       
       set.seed(input$seed_set)
@@ -533,7 +534,7 @@ shinyServer(function(input, output, session) {
     rf_summary <- reactive({
       rf_fit()$results
     })
-    
+    #################################################################
     output$trnctrl <- renderPrint({
       
       if (is.null(train_ctrl())){
@@ -1084,6 +1085,8 @@ shinyServer(function(input, output, session) {
       }
       
     })
+    
+    ##############Single Point Prediction Tab######################
     
     output$sum_stats_total_ui <- renderTable({
       sum_stats_total
