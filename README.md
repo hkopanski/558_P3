@@ -25,14 +25,24 @@ packages <- c("shiny", "tidyverse", "shinythemes", "forcats", "MASS",
               "caret", "DT", "matrixStats", "GGally", "shinycssloaders", 
               "AMR)
 
-libraries <- function(packages){
-  for(i in packages){
-    if(!require(package, character.only = TRUE)){
-      install.packages(package, dependencies = TRUE)
-      library(package, character.only = TRUE)
+
+libraries <- function(p){
+  
+  missing_lib <- c()
+  
+  for(i in p){
+    
+    if(i %in% rownames(installed.packages()) == FALSE){
+      
+      missing_lib <- append(missing_lib, i)
+      
     }
   }
+  
+  install.packages(missing_lib, dependencies = TRUE)
 }
+
+libraries(packages)
 ```
 
 To run this application directly from github, run the following in an R session:

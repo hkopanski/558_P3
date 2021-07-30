@@ -259,7 +259,7 @@ shinyServer(function(input, output, session) {
       paste("scatter_plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
-      ggsave(file, plot = scatter_plot(), device = "png")
+      ggsave(file, plot = scatter_plot(), device = "png", width = 40, height = 15, units = "cm", dpi = 300)
     },
     contentType = "image/png"
   )
@@ -269,7 +269,7 @@ shinyServer(function(input, output, session) {
       paste("den_integ_plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
-      ggsave(file, plot = density_integ(), device = "png")
+      ggsave(file, plot = density_integ(), device = "png", width = 40, height = 15, units = "cm", dpi = 300)
     },
     contentType = "image/png"
   )
@@ -279,7 +279,7 @@ shinyServer(function(input, output, session) {
       paste("den_DM_plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
-      ggsave(file, plot = density_DMSNR(), device = "png")
+      ggsave(file, plot = density_DMSNR(), device = "png", width = 40, height = 15, units = "cm", dpi = 300)
     },
     contentType = "image/png"
   )
@@ -289,7 +289,7 @@ shinyServer(function(input, output, session) {
       paste("pair_plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
-      ggsave(file, plot = pairs_plot, device = "png")
+      ggsave(file, plot = pairs_plot, device = "png" , width = 40, height = 15, units = "cm", dpi = 300)
     },
     contentType = "image/png"
   )
@@ -299,7 +299,7 @@ shinyServer(function(input, output, session) {
       paste("boxplot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
-      ggsave(file, plot = boxplot_pulsar(), device = "png")
+      ggsave(file, plot = boxplot_pulsar(), device = "png", width = 40, height = 15, units = "cm", dpi = 300)
     },
     contentType = "image/png"
   )
@@ -683,7 +683,7 @@ shinyServer(function(input, output, session) {
     
     log_misclass <- reactive({
       
-      paste("The log regression misclassification rate is" , round(sum(log_pred() != df_test()$Class) / nrow(df_test()), 3))
+      paste("The logistic regression misclassification rate is" , round(sum(log_pred() != df_test()$Class) / nrow(df_test()), 3))
       
     })
     
@@ -807,7 +807,7 @@ shinyServer(function(input, output, session) {
     
     knn_misclass <- reactive({
       
-      paste("The knn regression misclassification rate is" , round(sum(knn_pred() != df_test()$Class) / nrow(df_test()), 3))
+      paste("The knn classification misclassification rate is" , round(sum(knn_pred() != df_test()$Class) / nrow(df_test()), 3))
       
     })
     
@@ -929,7 +929,7 @@ shinyServer(function(input, output, session) {
     
     rf_misclass <- reactive({
       
-      paste("The rf regression misclassification rate is" , round(sum(rf_pred() != df_test()$Class) / nrow(df_test()), 3))
+      paste("The random forest misclassification rate is" , round(sum(rf_pred() != df_test()$Class) / nrow(df_test()), 3))
       
     })
     
