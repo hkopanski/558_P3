@@ -66,7 +66,6 @@ PCA_tab <- data.frame(PCA_pulsar$rotation,
 
 colnames(df_pca_plot) <- c("PCA", "variance")
 
-
 #Making a stats table for the 8 predictors
 sum_stats_total <- df_pulsar %>%  summarise(across(starts_with(c("integ", "DMSNR")), list(mean = mean, min = min, max = max)))
 sum_stats_total <- t(sum_stats_total)
@@ -224,13 +223,11 @@ shinyServer(function(input, output, session) {
     
   })
   
-  pairs_plot <- ggpairs(df_pulsar, mapping = ggplot2::aes(color = Class))
+  pairs_plot <-  ggpairs(df_pulsar, mapping = ggplot2::aes(color = Class))
   
-  output$pairs_plot_ui <- renderPlot({
-    
+  output$pairs_plot_ui <- renderPlot({ 
     pairs_plot
-    
-  })
+    })
   
   boxplot_pulsar <- reactive({
     g <- 

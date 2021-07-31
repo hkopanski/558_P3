@@ -139,20 +139,23 @@ shinyUI(fluidPage(
                                       "Select the Plot Type",
                                       list("Scatter" = "A",
                                            "Density" = "B",
-                                           "Pairs" = "C",
-                                           "Boxplots" = "D")),
+                                           "Boxplots" = "D",
+                                           "Pairs" = "C")
+                                      ),
                          br(),
                          radioButtons("split_on_class",
                                       "Split chart on Class",
                                       list("Yes" = "yes",
-                                           "No" = "no")),
+                                           "No" = "no")
+                                      ),
                          br(),
                          h4("Select below to use standardized data"),
                          br(),
                          radioButtons("df_type",
                                       "Select Data Type",
                                       list("Raw" = "raw_pulsar_data",
-                                           "Standardized" = "standard_pulsar_data")),
+                                           "Standardized" = "standard_pulsar_data")
+                                      ),
                          br(),
                          conditionalPanel(condition = "input.plot_type == 'A'",
                          br(),                  
@@ -171,18 +174,22 @@ shinyUI(fluidPage(
                          
                          selectInput("var_sel2", "Second Variable to Plot (Y Axis)", 
                                      "", 
-                                     selected = "DMSNR_mean")),
+                                     selected = "DMSNR_mean")
+                         ),
                          downloadButton("downloadEDA", "Download data used in this Section"),
                          p(),
                          conditionalPanel(condition = "input.plot_type == 'A'",
-                                          downloadButton("download_plot1", "Download plot (Scatter)")),
+                                          downloadButton("download_plot1", "Download plot (Scatter)")
+                                          ),
                          conditionalPanel(condition = "input.plot_type == 'B'",
                                           downloadButton("download_plot2", "Download Density Plot (Integrated)"),
                                           p(),
-                                          downloadButton("download_plot3", "Download Density plot (DM-SNR)")),
+                                          downloadButton("download_plot3", "Download Density plot (DM-SNR)")
+                                          ),
                          conditionalPanel(condition = "input.plot_type == 'C'",
                                           downloadButton("download_plot4", "Download Pairs Plot"),
-                                          p("Click once and please wait, pairs plot download takes a moment to prepare")),
+                                          p("Click once and please wait, pairs plot download takes a moment to prepare")
+                                          ),
                          conditionalPanel(condition = "input.plot_type == 'D'",
                                           downloadButton("download_plot5", "Download Boxplot"),
                                           p())
@@ -192,19 +199,24 @@ shinyUI(fluidPage(
                          conditionalPanel(condition = "input.plot_type == 'A'",
                             withSpinner(plotOutput("edaPlot", dblclick = "scplot_dblclick",
                                                    brush = brushOpts(id = "scplot_brush", 
-                                                                     resetOnNew = TRUE)), 
-                                        type = 5)),
+                                                                     resetOnNew = TRUE)
+                                                   ), 
+                                        type = 5)
+                            ),
                          conditionalPanel(condition = "input.plot_type == 'B'",
                             h4("Density Plot for the 4 Integrated Measurements"),
                             withSpinner(plotOutput("den_plot1_ui"), type = 5),
                             h4("Density Plot for the 4 DM-SNR Measurements"),
-                            withSpinner(plotOutput("den_plot2_ui"), type = 5)),
+                            withSpinner(plotOutput("den_plot2_ui"), type = 5)
+                            ),
                          conditionalPanel(condition = "input.plot_type == 'C'",
                             h4("Pairs Plot for Pulsar Data"),
-                            withSpinner(plotOutput("pairs_plot_ui"),type = 5)),
+                            withSpinner(plotOutput("pairs_plot_ui"),type = 5)
+                            ),
                          conditionalPanel(condition = "input.plot_type == 'D'",
                             h4("Boxplot for Pulsar Data"),
-                            withSpinner(plotOutput("boxplot_ui"),type = 5)),
+                            withSpinner(plotOutput("boxplot_ui"),type = 5)
+                            ),
                          withSpinner(tableOutput("information"), type = 5)
                      )
                  )
@@ -214,7 +226,8 @@ shinyUI(fluidPage(
                      sidebarPanel(radioButtons("dd_type",
                                                "Select Unsupervised Learning Type",
                                                list("K Means" = "A",
-                                                    "PCA" = "B")),
+                                                    "PCA" = "B")
+                                               ),
                                   conditionalPanel(condition = "input.dd_type == 'A'",
                                                    sliderInput("k_clust", "Number of Clusters (K)", min = 2, max = 8, value = 3),
                                                    selectInput("km_sel1", "First Variable to Plot (X Axis)", 
@@ -230,12 +243,14 @@ shinyUI(fluidPage(
                                                    
                                                    selectInput("km_sel2", "Second Variable to Plot (Y Axis)", 
                                                                "", 
-                                                               selected = "DMSNR Mean")),
+                                                               selected = "DMSNR Mean")
+                                                   ),
                                   conditionalPanel(condition = "input.dd_type == 'B'",
                                                    radioButtons("pca_plot_type", "Select a PCA Plot",
                                                                 list("Biplot" = "A",
                                                                      "Screeplot" = "B",
-                                                                     "Screeplot (Cumulative)" = "C")),
+                                                                     "Screeplot (Cumulative)" = "C")
+                                                                ),
                                   ),
                                   br(),
                                   conditionalPanel(condition = "input.dd_type == 'B' & input.pca_plot_type == 'A'",
@@ -259,15 +274,20 @@ shinyUI(fluidPage(
                                           withSpinner(plotOutput("kmeans_plot", dblclick = "kplot_dblclick",
                                                                  brush = brushOpts(id = "kplot_brush", 
                                                                                    resetOnNew = TRUE)), 
-                                                                 type = 5)),
+                                                                 type = 5)
+                                          ),
                          conditionalPanel(condition = "input.dd_type == 'B' & input.pca_plot_type == 'A'",
-                                          withSpinner(plotOutput("PCA_biplot"), type = 5)),
+                                          withSpinner(plotOutput("PCA_biplot"), type = 5)
+                                          ),
                          conditionalPanel(condition = "input.dd_type == 'B' & input.pca_plot_type == 'B'",
-                                          withSpinner(plotOutput("PCA_scree"), type = 5)),
+                                          withSpinner(plotOutput("PCA_scree"), type = 5)
+                                          ),
                          conditionalPanel(condition = "input.dd_type == 'B' & input.pca_plot_type == 'C'",
-                                          withSpinner(plotOutput("PCA_scree_cum"), type = 5)),
+                                          withSpinner(plotOutput("PCA_scree_cum"), type = 5)
+                                          ),
                          conditionalPanel(condition = "input.dd_type == 'B'",
-                                          withSpinner(tableOutput("PCA_tab"), type = 5)),
+                                          withSpinner(tableOutput("PCA_tab"), type = 5)
+                                          ),
                          verbatimTextOutput("PCA_text")
                      )
                  )
@@ -304,7 +324,8 @@ shinyUI(fluidPage(
                                           
                                           selectInput("method_opt", "Cross-Validation Methods", list("Repeat CV" = "repeatedcv",
                                                                                                      "CV" = "cv",
-                                                                                                     "LOOCV" = "LOOCV")),
+                                                                                                     "LOOCV" = "LOOCV")
+                                                      ),
                                           numericInput("k_fold", "K folds for Cross Validation", 
                                                        min = 1, max = 10, value = 5, step = 1),
                                           numericInput("cv_repeats", "Number of Repeats", 
@@ -332,7 +353,8 @@ shinyUI(fluidPage(
                          radioButtons("model_sel", "Select Models to View in Prediction Tab", list("Logistic Regression" = "glm",
                                                                                               "KNN Analysis" = "knn",
                                                                                               "Ensemble Method" = "rf"),
-                                            selected = c("glm")),
+                                            selected = c("glm")
+                                      ),
                          p("Once the models have been trained they are ready for testing"),
                          actionButton("test_model", "Run Models on Test Set", class = "btn-success")
                          ),
@@ -345,7 +367,7 @@ shinyUI(fluidPage(
                                                 and Random Forests. Below is a short summary of those three methods. All information 
                                                 presented here was pulled from 'An Introduction to Statistical Learning' by James et al.",
                                                 tags$a(href = "https://www.statlearning.com/", "This link"),"will take you to the book's 
-                                                web page. There you will be able to find a more in depth explanation of the methods in this 
+                                                web page. There you will be able to find a more in depth explanation of the methods used in this 
                                                 application as well as some additional ones."),
                                               h3("Logistic Regression"),
                                               p("Logistic regression is a generalized form of linear regression. The main difference being 
@@ -353,22 +375,26 @@ shinyUI(fluidPage(
                                                 observation falls in a certain classification. In this case, the logistic regression is determining
                                                 whether the probability of a particular neutron star is a pulsar or not. The default setting is 50%,
                                                 but this can be adjusted manually if explicitly indicated."),
-                                              p("The general form of the logisitic regression equation are as follows:"),
-                                              p(strong("Form 1")),
+                                              p("The general form of the logistic regression equation are as follows:"),
+                                              p(strong("Form 1")
+                                                ),
                                               helpText("$$ln\\left(\\frac{p(x)}{1 - p(x)}\\right) = \\beta_0 + \\beta_1x_1 + \\beta_2x_2 + .......$$"),
-                                              p(strong("Form 2")),
+                                              p(strong("Form 2")
+                                                ),
                                               helpText("$$\\frac{p(x)}{1 - p(x)} = e^{\\beta_0 + \\beta_1x_1 + \\beta_2x_2 + .......}$$"),
-                                              p(strong("Form 3")),
+                                              p(strong("Form 3")
+                                                ),
                                               helpText("$$p(x) = \\frac{e^{\\beta_0 + \\beta_1x_1 + \\beta_2x_2 + .......}}{1 - e^{\\beta_0 + \\beta_1x_1 + \\beta_2x_2 + .......}}$$"),
                                               
                                               p("All three forms are derived from the same equation, but to focus on form 1, we can easily see how
-                                                logisitic and linear regression are related. Hence the name, generalized linear equation. The left side 
+                                                logistic and linear regression are related. Hence the name, generalized linear equation. The left side 
                                                 of the equation is what is known as the log odds, or logit, function. This is what essentially 'converts' 
                                                 a continuous term to a probability. In this case, without the logit function, we could have run a linear
                                                 regression model an created a cutoff point for the response. This would lead to odd results such as anything
                                                 over 100,000 is a pulsar. That value would not carry any real meaning and would be difficult to explain. 
-                                                Where as, denoted the response as a probability is a bit more intuitive."),
-                                              p("A disadvantage of logictic regression is the data is assumed to be linear, so "),
+                                                Where as, denoted the response as a probability is more intuitive."),
+                                              p("A disadvantage of logistic regression is the data boundary is assumed to be linear. Logistic regression 
+                                                does not do well in cases where data classifications are not linear."),
                                               h3("k Nearest Neighbors"),
                                               p("KNN is a  relatively easy concept to understand. Basically, classification is done by observing the k number 
                                                 of neighbors near a point of interest and classifying that point as the majority of the neighbor classification.
@@ -376,11 +402,12 @@ shinyUI(fluidPage(
                                                 'distance' is the euclidean distance and is calculated as such. The formula is as follows:"),
                                               p(strong("Euclidean Distance")),
                                               helpText("$$d^2 = d_{x_1}^2 + d_{x_2}^2 + d_{x_3}^2 + .......$$"), 
-                                              helpText(span("In the case of pulsar data, each \\(d_x\\) is a predictor mentioned in the application such as 
-                                                            Integrated Mean.", style = "color:gray")),
+                                              helpText(span("In the case of pulsar data, each \\(d_x\\) is the distance between two predictor values
+                                                            mentioned in the application such as Integrated Mean.", style = "color:gray")
+                                                       ),
                                               p("The disadvantage of KNN is that it suffers from the curse of dimensionality. Meaning the more terms that are
                                                 added the more data you would need. Adding more predictors to the model without more data causes the model to 
-                                                become less accurate. Also, KNN can be computationaly intense, especially when there are a lot of data points."),
+                                                become less accurate. Also, KNN can be computationally intense, especially when there are a lot of data points."),
                                               h3("Ensemble Methods (Random Forests)"),
                                               p("It is difficult to explain what a random forest is without first explaining decision trees and bagging. To 
                                                 start of, decisions trees are flow chart type of way of classification. Meaning, when training a decision tree model
@@ -393,15 +420,20 @@ shinyUI(fluidPage(
                                                 The other third is used to test the model. This is done a large number of time, 500 or so. In each instance, an observation
                                                 is given a classification (or a value in the case of regression). Once the model training is complete, each observation is
                                                 given a classification based on majority vote (for example in 300 of the 500 trees, an observation was classified as a 
-                                                pulsar). In the case of regression, the observation is assigned the averege value of all the trees. This method reduces 
-                                                model variance since the observation value/classification is based on an average rather than a single tree basded model.
+                                                pulsar). In the case of regression, the observation is assigned the average value of all the trees. This method reduces 
+                                                model variance since the observation value/classification is based on an average rather than a single tree based model.
                                                 Random forest takes this concept one step further, and varies the number of predictors. This allows for less dominant 
                                                 predictors to contribute to the final model and provide an overall more accurate prediction. The disadvantage is they 
                                                 do not have a single closed form formula, so they are essentially a black box algorithm."),
-                                              p("Please, go to the 'Model Fitting' tab to begin training and testing models.")
+                                              p(strong("Please, go to the 'Model Fitting' tab to begin training and testing models."))
                                               ),
                                      tabPanel("Model Fitting", 
                                               
+                                              p(strong("Procedure flow is: Test/Train Split --> CV Arguments --> Create Models --> Test Models")),
+                                              p("If new test/train split is created, models must be recreated and retested. CV arguments 
+                                                only need to be updated if they change"),
+                                              p("Model information can be viewed prior to testing in 'Prediction on Test Data' tab. Test results 
+                                                will be displayed under model information."),
                                               dataTableOutput("pulsar_redux"),
                                               verbatimTextOutput("train_rows"),
                                               verbatimTextOutput("test_rows"),
@@ -441,7 +473,8 @@ shinyUI(fluidPage(
                                      tabPanel("Data Entry Prediction",
                                               h3("Enter a set of values to see what each model will predict"),
                                               p(strong("Note: Predictors not used in the training set will not be used here, 
-                                                       so modifying them would be a pointless endeavour.")),
+                                                       so modifying them would be a pointless endeavour.")
+                                                ),
                                               fluidRow(
                                                   column(width = 4,
                                                          numericInput("i_mean", "Integrated Mean",
@@ -478,15 +511,18 @@ shinyUI(fluidPage(
                                               fluidRow(
                                                   h3("Reference Data"),
                                                   column(4,
-                                                         p(strong("Total Data")),
+                                                         p(strong("Total Data")
+                                                           ),
                                                          tableOutput("sum_stats_total_ui")
                                                   ),
                                                   column(2,
-                                                         p(strong("Pulsar Data")),
+                                                         p(strong("Pulsar Data")
+                                                           ),
                                                          tableOutput("sum_stats_pulsar_ui")
                                                   ),
                                                   column(2,
-                                                         p(strong("Non Pulsar Data")),
+                                                         p(strong("Non Pulsar Data")
+                                                           ),
                                                          tableOutput("sum_stats_non_puls_ui")
                                                   )
                                                   
