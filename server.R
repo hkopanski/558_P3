@@ -972,19 +972,33 @@ shinyServer(function(input, output, session) {
     
     rf_var_imp <- reactive({
       
-      var_imp <- varImp(rf_fit(), scale = TRUE)
-      var_imp <- as.data.frame(var_imp$importance)
-      var_imp <- var_imp[order(var_imp[[1]]), ]
+      if(length(rf_fit()$coefnames) == 1){
+        
+        return()
+        
+      } else {
+        
+        var_imp <- varImp(rf_fit(), scale = TRUE)
+        var_imp <- as.data.frame(var_imp$importance)
+        var_imp <- var_imp[order(var_imp[[1]]), ]
+        var_imp
       
-      var_imp
+      }
     
     })
     
     rf_imp_plot <- reactive({
       
-      dotchart(rf_var_imp()[[1]] , labels = row.names(rf_var_imp()), col = dense_colors[5], 
-               main = "Variable Importance Plot", xlab = "Relative Importance")
-      
+      if(length(rf_fit()$coefnames) == 1){
+        
+        return()
+        
+      } else {
+        
+        dotchart(rf_var_imp()[[1]] , labels = row.names(rf_var_imp()), col = dense_colors[5],
+                 main = "Variable Importance Plot", xlab = "Relative Importance")
+      }
+        
     })
     
     output$rf_MC_ui <- renderPrint({
