@@ -61,13 +61,13 @@ shinyUI(fluidPage(
                       being highly magnetized and fast spinning. This characteristic causes 
                       them to appear as pulsating radio wave sources when observed (some do 
                       give off x-ray and even visible light pulses", 
-                      tags$a(href = "https://astronomy.swin.edu.au/cosmos/p/pulsar", "SWIN Link"), 
+                      tags$a(href = "https://astronomy.swin.edu.au/cosmos/p/pulsar", "(see SWIN Link)"), 
                       "). The pulse is a result of the pulsar’s radio beam sweeping past the earth 
                       for every rotation. Due to the very regular and precise nature of the 
                       pulses they give off, pulsars have become extremely important astronomical 
                       objects. They are used by physicists to conduct experiments on the 
                       most extreme areas of relativity and for making observations on the 
-                      structure of our universe",tags$a(href = "https://www.nrao.edu/pr/2012/aaaspulsars/", "NRAO Link"),".  
+                      structure of our universe",tags$a(href = "https://www.nrao.edu/pr/2012/aaaspulsars/", "(see NRAO Link)"),".  
                       More can be read about pulsars and how they are being studied can be found 
                       in the links found in this write up and here 
                       ", tags$a(href = "https://chandra.si.edu/xray_sources/neutron_stars.html", "Chandra Link"),"."),
