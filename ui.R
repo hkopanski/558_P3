@@ -472,8 +472,7 @@ shinyUI(fluidPage(
                                               ),
                                      tabPanel("Data Entry Prediction",
                                               h3("Enter a set of values to see what each model will predict"),
-                                              p(strong("Note: Predictors not used in the training set will not be used here, 
-                                                       so modifying them would be a pointless endeavour.")
+                                              p(strong("Note: Only predictors specified during model training will be used here.")
                                                 ),
                                               fluidRow(
                                                   column(width = 4,

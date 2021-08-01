@@ -508,7 +508,7 @@ shinyServer(function(input, output, session) {
             method = "knn", 
             trControl = train_ctrl(), 
             preProcess = c("center", "scale"), 
-            tuneGrid = expand.grid(k = 2:input$max_k))
+            tuneGrid = expand.grid(k = 1:input$max_k))
     })
     
     knn_summary <- reactive({
