@@ -201,7 +201,9 @@ shinyUI(fluidPage(
                                                    brush = brushOpts(id = "scplot_brush", 
                                                                      resetOnNew = TRUE)
                                                    ), 
-                                        type = 5)
+                                        type = 5),
+                            p("Click and drag to select an area, double click inside 
+                              selected area to zoom in, double click without selecting to zoom out")
                             ),
                          conditionalPanel(condition = "input.plot_type == 'B'",
                             h4("Density Plot for the 4 Integrated Measurements"),
