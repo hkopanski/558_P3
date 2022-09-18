@@ -24,7 +24,7 @@ Running the following code will check for and install the required libraries if 
 ```
 packages <- c("shiny", "tidyverse", "shinythemes", "forcats", 
               "caret", "DT", "matrixStats", "GGally", "shinycssloaders", 
-              "AMR)
+              "AMR")
 
 
 libraries <- function(p){
